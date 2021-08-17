@@ -1,0 +1,13 @@
+.centered-form {
+  border-radius: 20px;
+  margin: auto;
+  width: 50%;
+  border: 3px solid rgb(82, 184, 252);
+  padding: 10px;
+}
+.centered-title {
+  margin: 2rem auto;
+  width: 50%;
+  text-align: center;
+  color: #002f6c;
+}
