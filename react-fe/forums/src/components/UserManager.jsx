@@ -1,36 +1,68 @@
-import { Table, Container, Row } from "react-bootstrap";
+import { Table, Container, Row, Button, ButtonGroup } from "react-bootstrap";
+import ButtonCreateNew from "./ButtonCreateNew";
 
 const UserManager = () => {
   return (
     <Container fluid>
-      <Row></Row>
+      <Row style={{marginBottom:"2em"}}>
+        <h4>Quản lý người dùng</h4>
+        <ButtonCreateNew label="Đăng ký người dùng mới" />
+      </Row>
       <Row>
         <Table striped bordered hover size="sm">
           <thead>
             <tr>
-              <th>#</th>
-              <th>First Name</th>
-              <th>Last Name</th>
+              <th>ID</th>
               <th>Username</th>
+              <th>Full name</th>
+              <th>Email</th>
+              <th>Faculty</th>
+              <th>Role</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>1</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
+              <td>lvtute</td>
+              <td>Luong Van Thuan</td>
+              <td>lvtute@gmail.com</td>
+              <td>Information Technology</td>
+              <td>Adviser</td>
+              <td>
+                <ButtonGroup aria-label="Basic example">
+                  <Button variant="warning">Sửa</Button>
+                  <Button variant="danger">Xóa</Button>
+                </ButtonGroup>
+              </td>
             </tr>
             <tr>
-              <td>2</td>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
+              <td>1</td>
+              <td>lvtute</td>
+              <td>Luong Van Thuan</td>
+              <td>lvtute@gmail.com</td>
+              <td>Information Technology</td>
+              <td>Adviser</td>
+              <td>
+                <ButtonGroup aria-label="Basic example">
+                  <Button variant="warning">Sửa</Button>
+                  <Button variant="danger">Xóa</Button>
+                </ButtonGroup>
+              </td>
             </tr>
             <tr>
-              <td>3</td>
-              <td colSpan="2">Larry the Bird</td>
-              <td>@twitter</td>
+              <td>1</td>
+              <td>lvtute</td>
+              <td>Luong Van Thuan</td>
+              <td>lvtute@gmail.com</td>
+              <td>Information Technology</td>
+              <td>Adviser</td>
+              <td>
+                <ButtonGroup aria-label="Basic example">
+                  <Button variant="warning">Sửa</Button>
+                  <Button variant="danger">Xóa</Button>
+                </ButtonGroup>
+              </td>
             </tr>
           </tbody>
         </Table>

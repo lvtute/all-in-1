@@ -1,26 +1,17 @@
 import "./App.css";
 
-// pages
-import Login from "./pages/Login";
-import AdminDashBoard from "./pages/AdminDashBoard";
-
-import { Route, Switch } from "react-router-dom";
-import Layout from "./layout/Layout";
+import { BrowserRouter as Router } from "react-router-dom";
+import NavigationBar from "./components/NavigationBar";
+import MyRoutes from "./components/MyRoutes";
 
 function App() {
   return (
-    <div>
+    <Router>
       <div>
-        <Layout>
-          <Switch>
-            <Route path="/login" component={Login} />
-            <Route path="/admin" component={AdminDashBoard} />
-            {/* <Route component={NotFound} /> */}
-          </Switch>
-        </Layout>
+        <NavigationBar />
+        <MyRoutes />
       </div>
-    </div>
+    </Router>
   );
 }
-
 export default App;

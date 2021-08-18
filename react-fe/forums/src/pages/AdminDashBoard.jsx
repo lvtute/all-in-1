@@ -1,45 +1,62 @@
 import { ListGroup, Container, Row, Col } from "react-bootstrap";
-import CenteredTitle from "../components/CenteredTitle";
 import UserManager from "../components/UserManager";
+import QuestionManager from "../components/QuestionManager";
+import FacultyManager from "../components/FacultyManager";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 const AdminDashBoard = () => {
+  // path enum
+  const adminPath = Object.freeze({
+    user: "/admin/users",
+    question: "/admin/questions",
+    faculty: "/admin/faculty",
+  });
 
-  // states
-
-  // functions
-  const showUserManager = () => {
-    console.log("I'm at User manager");
-  };
-  const showQuestionManager = () => {
-    console.log("I'm at Question manager");
-  };
-  const showFacultyManager = () => {
-    console.log("I'm at Faculty manager");
-  };
-
-  // render
   return (
-    <Container fluid>
-      <CenteredTitle title="ADMIN DASHBOARD"/>
-      <Row>
-        <Col md="3">
-          <ListGroup>
-            <ListGroup.Item onClick={showUserManager} action variant="info">
-              Quản lý User
-            </ListGroup.Item>
-            <ListGroup.Item onClick={showQuestionManager} action variant="info">
-              Quản lý câu hỏi
-            </ListGroup.Item>
-            <ListGroup.Item onClick={showFacultyManager} action variant="info">
-              Quản lý phòng ban
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-        <Col md="9">
-          <UserManager/>
-        </Col>
-      </Row>
-    </Container>
+    <Router>
+      <div>
+        <Container fluid>
+          <h2 className="left-title">ADMIN DASHBOARD</h2>
+          <Row>
+            <Col md="3">
+              <ListGroup>
+                <Link to={`${adminPath.user}`}>
+                  <ListGroup.Item action variant="info">
+                    Quản lý User
+                  </ListGroup.Item>
+                </Link>
+
+                <Link to={`${adminPath.question}`}>
+                  <ListGroup.Item action variant="info">
+                    Quản lý câu hỏi
+                  </ListGroup.Item>
+                </Link>
+
+                <Link to={`${adminPath.faculty}`}>
+                  <ListGroup.Item action variant="info">
+                    Quản lý phòng ban
+                  </ListGroup.Item>
+                </Link>
+              </ListGroup>
+            </Col>
+
+            <Col md="9">
+              <Switch>
+                <Route path={`${adminPath.user}`}>
+                  <UserManager />
+                </Route>
+                <Route path={`${adminPath.question}`}>
+                  <QuestionManager />
+                </Route>
+                <Route path={`${adminPath.faculty}`}>
+                  <FacultyManager />
+                </Route>
+              </Switch>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+    </Router>
   );
 };
 export default AdminDashBoard;
