@@ -16,8 +16,8 @@ import java.util.Set;
 @ToString
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "email")
+        @UniqueConstraint(name = "unique_username_constraint",columnNames = "username"),
+        @UniqueConstraint(name = "unique_email_constraint", columnNames = "email")
 })
 public class User {
     @Id
@@ -37,11 +37,17 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name="faculty_id")
+    private Faculty faculty;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+
+    private boolean isDeleted;
 
     public User() {
     }
