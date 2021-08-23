@@ -1,5 +1,6 @@
 package com.hcmute.tlcn2021.exception;
 
+import com.hcmute.tlcn2021.payload.response.ErrorMessageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -12,30 +13,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class ApiExceptionHandler {
-
-//    @ExceptionHandler(EmailExistedException.class)
-//    public ResponseEntity<String> handleEmailAlreadyExistedException(EmailExistedException exception) {
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-//    }
-//
-//    @ExceptionHandler(UsernameExistedException.class)
-//    public ResponseEntity<String> handleUsernameAlreadyExistedException(UsernameExistedException exception) {
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-//    }
-
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    public ResponseEntity<ErrorMessageResponse> handleUserNotFoundException(UserNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessageResponse(exception.getMessage()));
     }
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public ResponseEntity<String> handleUniqueConstraintException(SQLIntegrityConstraintViolationException exception) throws SQLIntegrityConstraintViolationException {
+    public ResponseEntity<ErrorMessageResponse> handleUniqueConstraintException
+            (SQLIntegrityConstraintViolationException exception)
+            throws SQLIntegrityConstraintViolationException {
+
         if (exception.getMessage().contains("'user.unique_username_constraint'")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already existed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorMessageResponse("Username already existed"));
+
         } else if (exception.getMessage().contains("'user.unique_email_constraint'")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already existed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorMessageResponse("Email already existed"));
+
         }
         throw exception;
 

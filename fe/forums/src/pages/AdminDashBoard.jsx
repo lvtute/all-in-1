@@ -1,7 +1,7 @@
 import { ListGroup, Container, Row, Col } from "react-bootstrap";
 import UserManager from "../components/admin-dashboard/user-manager/UserManager";
-import QuestionManager from "../components/admin-dashboard/QuestionManager";
-import FacultyManager from "../components/admin-dashboard/FacultyManager";
+import QuestionManager from "../components/admin-dashboard/question-manager/QuestionManager";
+import FacultyManager from "../components/admin-dashboard/faculty-manager/FacultyManager";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 const AdminDashBoard = () => {
@@ -42,13 +42,13 @@ const AdminDashBoard = () => {
 
             <Col md="9">
               <Switch>
-                <Route path={`${adminPath.user}`}>
+                <Route path={adminPath.user}>
                   <UserManager />
                 </Route>
-                <Route path={`${adminPath.question}`}>
+                <Route path={adminPath.question}>
                   <QuestionManager />
                 </Route>
-                <Route path={`${adminPath.faculty}`}>
+                <Route path={adminPath.faculty}>
                   <FacultyManager />
                 </Route>
               </Switch>
