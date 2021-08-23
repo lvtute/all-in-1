@@ -3,7 +3,10 @@ package com.hcmute.tlcn2021.service;
 import com.hcmute.tlcn2021.config.jwt.JwtUtils;
 import com.hcmute.tlcn2021.config.service.UserDetailsImpl;
 import com.hcmute.tlcn2021.enumeration.ERole;
+import com.hcmute.tlcn2021.exception.CustomedRoleNotFoundException;
+import com.hcmute.tlcn2021.exception.FacultyNotFoundException;
 import com.hcmute.tlcn2021.exception.UserNotFoundException;
+import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Role;
 import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.LoginRequest;
@@ -12,6 +15,7 @@ import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
 import com.hcmute.tlcn2021.payload.response.JwtResponse;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.payload.response.UserDetailsResponse;
+import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.repository.RoleRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -25,10 +29,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,10 +55,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private FacultyRepository facultyRepository;
+
     @Override
     public JwtResponse signIn(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                        loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -74,15 +81,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public MessageResponse signUp(SignupRequest signUpRequest) {
-
-        // Create new user's account
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
-        Optional<ERole> requestedERole = Optional.ofNullable(signUpRequest.getRole());
-        Optional<Role> role = roleRepository.findByName(requestedERole.orElse(ERole.ROLE_ADVISER));
-        role.ifPresent(value -> user.setRoles(Collections.singleton(value)));
+        user.setRoles(Collections.singleton(getRoleFromDb(signUpRequest.getRole())));
+        Faculty faculty = facultyRepository.findByName(signUpRequest.getFaculty())
+                .orElseThrow(() -> new FacultyNotFoundException(
+                        "Faculty with name '" + signUpRequest.getFaculty() +
+                                "' does not exist"
+                ));
+        user.setFaculty(faculty);
 
         userRepository.save(user);
 
@@ -90,8 +99,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(UserUpdateRequest userUpdateRequest) {
-        return null;
+    public UserDetailsResponse updateUser(UserUpdateRequest userUpdateRequest) {
+        Long id = userUpdateRequest.getId();
+
+        User foundUser = userRepository.findById(id).orElseThrow(() ->
+                new UserNotFoundException("User with id = " + id + " can not be found!"));
+        foundUser.setRoles(new HashSet<>(Collections.singletonList(getRoleFromDb(userUpdateRequest.getRole()))));
+        foundUser.setEmail(userUpdateRequest.getEmail());
+        foundUser.setFaculty(facultyRepository.findByName(userUpdateRequest.getFaculty())
+                .orElseThrow(() ->
+                        new FacultyNotFoundException("Faculty with name '"
+                                + userUpdateRequest.getFaculty() + "' does not exits")));
+
+        userRepository.save(foundUser);
+        return convert(userRepository.save(foundUser));
     }
 
     @Override
@@ -99,11 +120,24 @@ public class UserServiceImpl implements UserService {
 
         User foundUser = userRepository.findById(id).orElseThrow(() ->
                 new UserNotFoundException("User with id = " + id + " can not be found!"));
+        return convert(foundUser);
+    }
+
+    private UserDetailsResponse convert(User user) {
         UserDetailsResponse result = modelMapper
-                .map(foundUser, UserDetailsResponse.class);
-        result.setRoleNames(foundUser.getRoles().stream().
+                .map(user, UserDetailsResponse.class);
+
+        result.setRoleNames(user.getRoles().stream().
                 map(role -> role.getName().toString()).collect(Collectors.toSet()));
 
         return result;
+    }
+
+    private Role getRoleFromDb(ERole eRole) {
+        Optional<ERole> requestedERole = Optional.ofNullable(eRole);
+        Optional<Role> role = roleRepository.findByName(requestedERole.orElse(ERole.ROLE_ADVISER));
+        return role.orElseThrow(() -> new CustomedRoleNotFoundException(
+                "Can not find role '" + eRole.toString() + "' in the database"
+        ));
     }
 }

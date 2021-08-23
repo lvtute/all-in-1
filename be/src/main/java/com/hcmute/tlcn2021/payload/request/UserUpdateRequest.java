@@ -4,23 +4,24 @@ import com.hcmute.tlcn2021.enumeration.ERole;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Getter
 @Setter
 public class UserUpdateRequest {
 
-    @NotEmpty
+    @NotNull
     private Long id;
 
-    @NotEmpty
+    @NotBlank
     @Size(max = 50)
     @Email
     private String email;
 
-    @NotEmpty
+    @NotBlank
+    private String faculty;
+
+    @NotNull
     private ERole role;
 
 }

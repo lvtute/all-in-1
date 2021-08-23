@@ -10,14 +10,13 @@ import java.util.Set;
 
 @Getter
 @Setter
-@ToString
 @Entity
 @Table
 public class Faculty {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String name;
 

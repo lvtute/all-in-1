@@ -13,7 +13,6 @@ import java.util.Set;
 
 @Getter
 @Setter
-@ToString
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(name = "unique_username_constraint",columnNames = "username"),
@@ -47,6 +46,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @Column(columnDefinition = "boolean default false")
     private boolean isDeleted;
 
     public User() {

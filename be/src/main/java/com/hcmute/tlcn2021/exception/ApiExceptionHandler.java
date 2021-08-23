@@ -13,10 +13,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class ApiExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleUserNotFoundException(UserNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessageResponse(exception.getMessage()));
+    }
+
+    @ExceptionHandler(FacultyNotFoundException.class)
+    public ResponseEntity<ErrorMessageResponse> handleFacultyNotFoundException(FacultyNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(exception.getMessage()));
     }

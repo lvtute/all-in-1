@@ -14,7 +14,7 @@ public interface UserService {
 
     MessageResponse signUp(SignupRequest signupRequest);
 
-    User updateUser(UserUpdateRequest userUpdateRequest);
+    UserDetailsResponse updateUser(UserUpdateRequest userUpdateRequest);
 
     UserDetailsResponse findById(Long id);
 }
