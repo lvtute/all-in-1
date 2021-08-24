@@ -1,12 +1,13 @@
 package com.hcmute.tlcn2021.service;
 
-import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.LoginRequest;
 import com.hcmute.tlcn2021.payload.request.SignupRequest;
 import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
 import com.hcmute.tlcn2021.payload.response.JwtResponse;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.payload.response.UserDetailsResponse;
+import com.hcmute.tlcn2021.payload.response.UsersPaginationResponse;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
@@ -14,7 +15,11 @@ public interface UserService {
 
     MessageResponse signUp(SignupRequest signupRequest);
 
-    UserDetailsResponse updateUser(UserUpdateRequest userUpdateRequest);
+    UserDetailsResponse update(UserUpdateRequest userUpdateRequest);
 
     UserDetailsResponse findById(Long id);
+
+    void deleteById(Long id);
+
+    UsersPaginationResponse getPage(Pageable pageable);
 }

@@ -20,6 +20,11 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(exception.getMessage()));
     }
+    @ExceptionHandler(UserDeleteFailedException.class)
+    public ResponseEntity<ErrorMessageResponse> handleUserDeleteFailedException(UserDeleteFailedException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessageResponse(exception.getMessage()));
+    }
 
     @ExceptionHandler(FacultyNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleFacultyNotFoundException(FacultyNotFoundException exception) {

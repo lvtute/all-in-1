@@ -5,6 +5,7 @@ import com.hcmute.tlcn2021.config.service.UserDetailsImpl;
 import com.hcmute.tlcn2021.enumeration.ERole;
 import com.hcmute.tlcn2021.exception.CustomedRoleNotFoundException;
 import com.hcmute.tlcn2021.exception.FacultyNotFoundException;
+import com.hcmute.tlcn2021.exception.UserDeleteFailedException;
 import com.hcmute.tlcn2021.exception.UserNotFoundException;
 import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Role;
@@ -15,11 +16,14 @@ import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
 import com.hcmute.tlcn2021.payload.response.JwtResponse;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.payload.response.UserDetailsResponse;
+import com.hcmute.tlcn2021.payload.response.UsersPaginationResponse;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.repository.RoleRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +31,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -99,7 +104,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailsResponse updateUser(UserUpdateRequest userUpdateRequest) {
+    public UserDetailsResponse update(UserUpdateRequest userUpdateRequest) {
         Long id = userUpdateRequest.getId();
 
         User foundUser = userRepository.findById(id).orElseThrow(() ->
@@ -123,6 +128,19 @@ public class UserServiceImpl implements UserService {
         return convert(foundUser);
     }
 
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        int affectedRows = userRepository.softDeleteUser(id);
+        if (affectedRows == 0)
+            throw new UserDeleteFailedException("There is error(s) trying to delete user with id = " + id);
+    }
+
+    @Override
+    public UsersPaginationResponse getPage(Pageable pageable) {
+        return convert(userRepository.findAll(pageable));
+    }
+
     private UserDetailsResponse convert(User user) {
         UserDetailsResponse result = modelMapper
                 .map(user, UserDetailsResponse.class);
@@ -134,10 +152,17 @@ public class UserServiceImpl implements UserService {
     }
 
     private Role getRoleFromDb(ERole eRole) {
-        Optional<ERole> requestedERole = Optional.ofNullable(eRole);
-        Optional<Role> role = roleRepository.findByName(requestedERole.orElse(ERole.ROLE_ADVISER));
+
+        Optional<Role> role = roleRepository.findByName(eRole);
         return role.orElseThrow(() -> new CustomedRoleNotFoundException(
                 "Can not find role '" + eRole.toString() + "' in the database"
         ));
+    }
+
+    private UsersPaginationResponse convert(Page<User> userPage) {
+        UsersPaginationResponse result = modelMapper.map(userPage, UsersPaginationResponse.class);
+        result.setContent(userPage.getContent().stream()
+                .map(this::convert).collect(Collectors.toList()));
+        return result;
     }
 }
