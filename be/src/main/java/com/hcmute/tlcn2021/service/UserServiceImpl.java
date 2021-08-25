@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UsersPaginationResponse getPage(Pageable pageable) {
-        return convert(userRepository.findAll(pageable));
+        return convert(userRepository.findAllByIsDeletedFalse(pageable));
     }
 
     private UserDetailsResponse convert(User user) {
