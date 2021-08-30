@@ -11,6 +11,7 @@ public class UsersPaginationResponse {
     List<UserDetailsResponse> content;
     int number;
     int size;
+    int totalElements;
     int totalPages;
 
 }

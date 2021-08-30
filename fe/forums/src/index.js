@@ -6,8 +6,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // import 'bootstrap/dist/js/bootstrap';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  // <React.StrictMode> // https://stackoverflow.com/questions/67415620/fixing-index-js1-warning-using-unsafe-componentwillreceiveprops-in-strict-mod
+    <App />,
+  // </React.StrictMode>,
   document.getElementById("root")
 );

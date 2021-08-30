@@ -1,27 +1,17 @@
-import axios from "axios";
-import authHeader from "./auth-header";
+// import authHeader from "./auth-header";
+import http from "../http-common";
 
-const API_URL = "http://localhost:8080/api/test/";
+// const getAdminBoard = () => {
+//   return axios.get(API_URL + "admin", { headers: authHeader() });
+// };
 
-const getPublicContent = () => {
-  return axios.get(API_URL + "all");
+const getAllWithPaging = (pageNum = 0, pageSize = 5) => {
+  if (pageNum > 0) pageNum--;
+  return http.get("/user?size=" + pageSize + "&page=" + pageNum);
 };
 
-const getUserBoard = () => {
-  return axios.get(API_URL + "adviser", { headers: authHeader() });
+const userService = {
+  getAllWithPaging,
 };
 
-const getModeratorBoard = () => {
-  return axios.get(API_URL + "dean", { headers: authHeader() });
-};
-
-const getAdminBoard = () => {
-  return axios.get(API_URL + "admin", { headers: authHeader() });
-};
-
-export default {
-  getPublicContent,
-  getUserBoard,
-  getModeratorBoard,
-  getAdminBoard,
-};
+export default userService;
