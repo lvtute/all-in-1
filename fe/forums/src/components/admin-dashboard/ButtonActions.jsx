@@ -1,11 +1,10 @@
 import { Button, ButtonGroup } from "react-bootstrap";
 
-const genericDelete = (service, dataRefresher) => (id) => {
+const genericDelete = (service) => (id) => {
   service
     .deleteById(id)
     .then((response) => {
       console.log(response);
-      dataRefresher();
     })
     .catch((error) => {
       console.log("delete error:");
@@ -13,11 +12,11 @@ const genericDelete = (service, dataRefresher) => (id) => {
     });
 };
 
-const ButtonActions = ({ service, id, dataRefresher }) => {
+const ButtonActions = ({ service, id }) => {
   return (
     <ButtonGroup aria-label="Basic example">
       <Button variant="warning">Sửa</Button>
-      <Button variant="danger" onClick={() => genericDelete(service, dataRefresher)(id)}>
+      <Button variant="danger" onClick={() => genericDelete(service)(id)}>
         Xóa
       </Button>
     </ButtonGroup>
