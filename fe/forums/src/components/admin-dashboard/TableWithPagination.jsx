@@ -19,6 +19,7 @@ const TableWithPagination = ({ data, columns, onTableChange }) => {
         {({ paginationProps, paginationTableProps }) => (
           <div>
             <BootstrapTable
+            remote
               keyField="id"
               data={data.content}
               columns={columns}
