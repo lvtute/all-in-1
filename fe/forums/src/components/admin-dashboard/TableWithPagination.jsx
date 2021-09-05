@@ -5,6 +5,7 @@ import paginationFactory, {
 } from "react-bootstrap-table2-paginator";
 
 const TableWithPagination = ({ data, columns, onTableChange }) => {
+
   return (
     <div>
       <PaginationProvider
@@ -19,7 +20,7 @@ const TableWithPagination = ({ data, columns, onTableChange }) => {
         {({ paginationProps, paginationTableProps }) => (
           <div>
             <BootstrapTable
-            remote
+              remote
               keyField="id"
               data={data.content}
               columns={columns}

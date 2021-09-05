@@ -3,15 +3,11 @@ import { useEffect, useState } from "react";
 import UserService from "../../../services/user.service";
 import ButtonActions from "../ButtonActions";
 import userService from "../../../services/user.service";
+import queryParamUtils from "../../../utils/queryParamUtils";
+import { useHistory, useLocation } from "react-router-dom";
 
 const createActionButtons = (cell, row, rowIndex) => {
-  console.log(`id=${row.id}`);
-  return (
-    <ButtonActions
-      service={userService}
-      id={row?.id}
-    />
-  );
+  return <ButtonActions service={userService} id={row?.id} />;
 };
 
 const columns = [
@@ -46,26 +42,33 @@ const columns = [
   },
 ];
 
-
 const UserTable = () => {
+  let history = useHistory();
+  const query = queryParamUtils.useQuery();
+
+  const path = useLocation().pathname;
+  // state to handle pageNum
+
   const [tableData, setTableData] = useState(Object);
 
   const handleTableChange = (type, { page, sizePerPage }) => {
     UserService.getAll(page, sizePerPage).then((response) => {
       setTableData(response?.data);
     });
+
+    // set the url param to match the current page
+    history.replace({ pathname: path, search: `?page=${page}` });
   };
-  
 
   useEffect(() => {
-    UserService.getAll()
+    UserService.getAll(query.get("page"))
       .then((response) => {
         setTableData(response?.data);
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [query]);
 
   return (
     <>

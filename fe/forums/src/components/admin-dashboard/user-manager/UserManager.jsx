@@ -5,7 +5,8 @@ import UserTable from "../user-manager/UserTable";
 import UserRegisterModal from "./UserRegisterModal";
 
 const UserManager = () => {
-  // states
+
+  // states to show or hide model (for register and update user)
   const [registerModalShow, setRegisterModalShow] = useState(false);
 
   return (
