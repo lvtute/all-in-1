@@ -52,7 +52,6 @@ const UserTable = () => {
   // get page num from the url query param
   let pageNum = queryParamUtils.useQuery().get("page");
   let history = useHistory();
-
   const path = useLocation().pathname;
 
   const [tableData, setTableData] = useState(Object);
@@ -60,17 +59,20 @@ const UserTable = () => {
   const reload = (pageNum, pageSize) => {
     UserService.getAll(pageNum, pageSize).then((response) => {
       setTableData(response?.data);
+
+      // set the url param to match the current page
+      history.push({ pathname: path, search: `?page=${pageNum}` });
+
       // do recusion when return empty array
-      if (response.data.content.length === 0 && pageNum > 2) {
+      if (response?.data?.content?.length === 0 && pageNum > 1) {
         reload(pageNum - 1, pageSize);
       }
     });
     console.log(`reloaded with page = ${pageNum}`);
   };
+
   const handleTableChange = (type, { page, sizePerPage }) => {
     reload(page, sizePerPage);
-    // set the url param to match the current page
-    history.replace({ pathname: path, search: `?page=${page}` });
   };
 
   useEffect(() => {
