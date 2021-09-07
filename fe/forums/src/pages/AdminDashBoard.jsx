@@ -2,14 +2,21 @@ import { ListGroup, Container, Row, Col } from "react-bootstrap";
 import UserManager from "../components/admin-dashboard/user-manager/UserManager";
 import QuestionManager from "../components/admin-dashboard/question-manager/QuestionManager";
 import FacultyManager from "../components/admin-dashboard/faculty-manager/FacultyManager";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+} from "react-router-dom";
 
 const AdminDashBoard = () => {
+  let match = useRouteMatch();
   // path enum
   const adminPath = Object.freeze({
-    user: "/admin/users",
-    question: "/admin/questions",
-    faculty: "/admin/faculty",
+    user: `${match.url}/user`,
+    question: `${match.url}/question`,
+    faculty: `${match.url}/faculty`,
   });
 
   return (
