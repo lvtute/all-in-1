@@ -3,7 +3,6 @@ package com.hcmute.tlcn2021.payload.request;
 import com.hcmute.tlcn2021.enumeration.ERole;
 import lombok.Getter;
 import lombok.Setter;
-
 import javax.validation.constraints.*;
 
 @Getter
@@ -22,10 +21,9 @@ public class SignupRequest {
     private ERole role;
 
     @NotBlank
-    @Size(min = 6, max = 40)
-    private String password;
+    private String faculty;
 
     @NotBlank
-    private String faculty;
+    private String fullName;
 
 }

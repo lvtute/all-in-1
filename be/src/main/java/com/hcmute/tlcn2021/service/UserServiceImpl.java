@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
     public MessageResponse signUp(SignupRequest signUpRequest) {
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
+                encoder.encode(generatePassword()));
 
         user.setRoles(Collections.singleton(getRoleFromDb(signUpRequest.getRole())));
         Faculty faculty = facultyRepository.findByName(signUpRequest.getFaculty())
@@ -97,6 +97,8 @@ public class UserServiceImpl implements UserService {
                                 "' does not exist"
                 ));
         user.setFaculty(faculty);
+
+        user.setFullName(signUpRequest.getFullName());
 
         userRepository.save(user);
 
@@ -164,5 +166,10 @@ public class UserServiceImpl implements UserService {
         result.setContent(userPage.getContent().stream()
                 .map(this::convert).collect(Collectors.toList()));
         return result;
+    }
+
+    // this method will generate a random password
+    private String generatePassword(){
+        return "1";
     }
 }
