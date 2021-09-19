@@ -1,4 +1,4 @@
-package com.hcmute.tlcn2021.service;
+package com.hcmute.tlcn2021.service.impl;
 
 import com.hcmute.tlcn2021.config.jwt.JwtUtils;
 import com.hcmute.tlcn2021.config.service.UserDetailsImpl;
@@ -20,6 +20,7 @@ import com.hcmute.tlcn2021.payload.response.UsersPaginationResponse;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.repository.RoleRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
+import com.hcmute.tlcn2021.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -88,19 +89,23 @@ public class UserServiceImpl implements UserService {
     public MessageResponse signUp(SignupRequest signUpRequest) {
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
+                encoder.encode(generatePassword()));
 
-        user.setRoles(Collections.singleton(getRoleFromDb(signUpRequest.getRole())));
-        Faculty faculty = facultyRepository.findByName(signUpRequest.getFaculty())
+        user.setRoles(Collections.singleton(roleRepository.findById(signUpRequest.getRoleId())
+                .orElseThrow(() -> new CustomedRoleNotFoundException("Role with id = " + signUpRequest.getRoleId() + "does not exist"))));
+        Faculty faculty = facultyRepository.findById(signUpRequest.getFacultyId())
                 .orElseThrow(() -> new FacultyNotFoundException(
-                        "Faculty with name '" + signUpRequest.getFaculty() +
+                        "Faculty with id = '" + signUpRequest.getFacultyId() +
                                 "' does not exist"
                 ));
         user.setFaculty(faculty);
 
-        userRepository.save(user);
+        user.setFullName(signUpRequest.getFullName());
 
-        return new MessageResponse("User registered successfully!");
+        User savedUser = userRepository.save(user);
+
+        return new MessageResponse(String.format("User %s registered successfully!",
+                savedUser.getUsername()));
     }
 
     @Override
@@ -164,5 +169,10 @@ public class UserServiceImpl implements UserService {
         result.setContent(userPage.getContent().stream()
                 .map(this::convert).collect(Collectors.toList()));
         return result;
+    }
+
+    // this method will generate a random password
+    private String generatePassword() {
+        return "1";
     }
 }

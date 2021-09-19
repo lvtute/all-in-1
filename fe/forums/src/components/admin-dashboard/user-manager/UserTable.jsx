@@ -10,7 +10,10 @@ import ConfirmationAlert from "../../ConfirmationAlert";
 const UserTable = () => {
   // state to show or hide confirmation alert modal (for deleting user)
   const [confirmationAlertShow, setConfirmationAlertShow] = useState(false);
-  <ConfirmationAlert isOpened={confirmationAlertShow} handleClose={()=> setConfirmationAlertShow(false)}/>;
+  <ConfirmationAlert
+    isOpened={confirmationAlertShow}
+    handleClose={() => setConfirmationAlertShow(false)}
+  />;
 
   const createActionButtons = (cell, row, rowIndex) => {
     return (
