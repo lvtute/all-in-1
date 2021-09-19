@@ -1,14 +1,17 @@
 package com.hcmute.tlcn2021.payload.request;
 
-import com.hcmute.tlcn2021.enumeration.ERole;
 import lombok.Getter;
 import lombok.Setter;
-import javax.validation.constraints.*;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
 public class SignupRequest {
-    @NotBlank
+    @NotNull
     @Size(min = 3, max = 20)
     private String username;
 
@@ -18,10 +21,10 @@ public class SignupRequest {
     private String email;
 
     @NotNull
-    private ERole role;
+    private long roleId;
 
-    @NotBlank
-    private String faculty;
+    @NotNull
+    private long facultyId;
 
     @NotBlank
     private String fullName;

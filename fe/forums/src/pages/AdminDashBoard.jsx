@@ -9,6 +9,7 @@ import {
   Link,
   useRouteMatch,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 const AdminDashBoard = () => {
   let match = useRouteMatch();
@@ -62,6 +63,7 @@ const AdminDashBoard = () => {
             </Col>
           </Row>
         </Container>
+        <ToastContainer />
       </div>
     </Router>
   );

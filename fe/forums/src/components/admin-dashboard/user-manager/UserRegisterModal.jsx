@@ -2,14 +2,31 @@ import { Modal, Form, Col, Button } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import facultyService from "../../../services/faculty.service";
 import roleService from "../../../services/role.service";
+import authenService from "../../../services/auth.service";
+import { toast } from "react-toastify";
+import { TOASTIFY_CONFIGS } from "../../../services/constants";
 
-const UserRegisterModal = ({ isOpened, onCloseEvent }) => {
-  
+const UserRegisterModal = ({ isOpened, onCloseFunction }) => {
+  const [isSubmitButtonDisabled, setSubmitButtonDisabled] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const formDataObj = Object.fromEntries(formData.entries());
-    console.log(formDataObj);
+    setSubmitButtonDisabled(true);
+
+    authenService
+      .register(formDataObj)
+      .then((res) => {
+        console.log(res.data);
+        toast.success(res.data?.message, TOASTIFY_CONFIGS);
+        onCloseFunction();
+        setSubmitButtonDisabled(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setSubmitButtonDisabled(false);
+      });
   };
 
   const [facultyList, setFacultyList] = useState([]);
@@ -21,7 +38,7 @@ const UserRegisterModal = ({ isOpened, onCloseEvent }) => {
   }, []);
 
   return (
-    <Modal animation={false} show={isOpened} onHide={onCloseEvent}>
+    <Modal animation={false} show={isOpened} onHide={onCloseFunction}>
       <Modal.Header closeButton>
         <Modal.Title id="example-custom-modal-styling-title">
           Đăng ký
@@ -56,7 +73,7 @@ const UserRegisterModal = ({ isOpened, onCloseEvent }) => {
           <Form.Row>
             <Form.Group as={Col} controlId="formGridRole">
               <Form.Label>Role</Form.Label>
-              <Form.Control as="select" name="role">
+              <Form.Control as="select" name="roleId">
                 {roleList?.map((role) => (
                   <option key={role.id} value={role.id}>
                     {role.name}
@@ -66,7 +83,7 @@ const UserRegisterModal = ({ isOpened, onCloseEvent }) => {
             </Form.Group>
             <Form.Group as={Col} controlId="formGridFaculty">
               <Form.Label>Khoa</Form.Label>
-              <Form.Control as="select">
+              <Form.Control as="select" name="facultyId">
                 {facultyList?.map((faculty) => (
                   <option key={faculty.id} value={faculty.id}>
                     {faculty.name}
@@ -76,7 +93,11 @@ const UserRegisterModal = ({ isOpened, onCloseEvent }) => {
             </Form.Group>
           </Form.Row>
 
-          <Button variant="primary" type="submit">
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={isSubmitButtonDisabled}
+          >
             Submit
           </Button>
         </Form>

@@ -1,7 +1,8 @@
-package com.hcmute.tlcn2021.service;
+package com.hcmute.tlcn2021.service.impl;
 
 import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
+import com.hcmute.tlcn2021.service.FacultyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
