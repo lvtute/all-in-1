@@ -1,23 +1,25 @@
 import { Button, ButtonGroup } from "react-bootstrap";
 
-const genericDelete = (service, reloader) => (id) => {
+const genericDelete = (service, funcReload) => (id) => {
   service
     .deleteById(id)
     .then((response) => {
-      console.log(response);
-      reloader();
+      funcReload();
     })
     .catch((error) => {
-      console.log("delete error:");
-      console.log(error);
-    });
+    }); 
 };
 
-const ButtonActions = ({ service, id, reloader }) => {
+const ButtonActions = ({ service, id, funcReload, openUpdatingModal }) => {
   return (
     <ButtonGroup aria-label="Basic example">
-      <Button variant="warning">Sửa</Button>
-      <Button variant="danger" onClick={() => genericDelete(service, reloader)(id)}>
+      <Button variant="warning" onClick={() => openUpdatingModal(id)}>
+        Sửa
+      </Button>
+      <Button
+        variant="danger"
+        onClick={() => genericDelete(service, funcReload)(id)}
+      >
         Xóa
       </Button>
     </ButtonGroup>

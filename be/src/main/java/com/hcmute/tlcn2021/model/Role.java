@@ -4,7 +4,6 @@ import com.hcmute.tlcn2021.enumeration.ERole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 

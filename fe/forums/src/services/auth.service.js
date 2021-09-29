@@ -1,6 +1,5 @@
 import http from "./http-common";
 
-
 const register = (signUpRequestObject) => {
   return http.post("/auth/sign-up", signUpRequestObject);
 };
@@ -33,6 +32,6 @@ const authenService = {
   // login,
   logout,
   getCurrentUser,
-}
+};
 
 export default authenService;

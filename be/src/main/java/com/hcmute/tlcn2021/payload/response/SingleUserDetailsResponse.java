@@ -1,19 +1,19 @@
 package com.hcmute.tlcn2021.payload.response;
 
+import com.hcmute.tlcn2021.model.Faculty;
+import com.hcmute.tlcn2021.model.Role;
 import lombok.*;
-
-import java.util.Set;
 
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDetailsResponse {
+public class SingleUserDetailsResponse {
     private Long id;
     private String username;
     private String email;
     private String fullName;
-    private String facultyName;
-    private Set<String> roleNames;
+    private Faculty faculty;
+    private Role role;
 }
