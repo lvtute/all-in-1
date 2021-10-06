@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class UsersPaginationResponse {
-    List<UserDetailsResponse> content;
+    List<UserInListResponse> content;
     int number;
     int size;
     int totalElements;

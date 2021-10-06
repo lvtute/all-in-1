@@ -7,16 +7,12 @@ import com.hcmute.tlcn2021.exception.CustomedRoleNotFoundException;
 import com.hcmute.tlcn2021.exception.FacultyNotFoundException;
 import com.hcmute.tlcn2021.exception.UserDeleteFailedException;
 import com.hcmute.tlcn2021.exception.UserNotFoundException;
-import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Role;
 import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.LoginRequest;
 import com.hcmute.tlcn2021.payload.request.SignupRequest;
 import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
-import com.hcmute.tlcn2021.payload.response.JwtResponse;
-import com.hcmute.tlcn2021.payload.response.MessageResponse;
-import com.hcmute.tlcn2021.payload.response.UserDetailsResponse;
-import com.hcmute.tlcn2021.payload.response.UsersPaginationResponse;
+import com.hcmute.tlcn2021.payload.response.*;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.repository.RoleRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
@@ -34,8 +30,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -91,14 +85,18 @@ public class UserServiceImpl implements UserService {
                 signUpRequest.getEmail(),
                 encoder.encode(generatePassword()));
 
-        user.setRoles(Collections.singleton(roleRepository.findById(signUpRequest.getRoleId())
-                .orElseThrow(() -> new CustomedRoleNotFoundException("Role with id = " + signUpRequest.getRoleId() + "does not exist"))));
-        Faculty faculty = facultyRepository.findById(signUpRequest.getFacultyId())
-                .orElseThrow(() -> new FacultyNotFoundException(
-                        "Faculty with id = '" + signUpRequest.getFacultyId() +
-                                "' does not exist"
-                ));
-        user.setFaculty(faculty);
+        user.setRole(roleRepository.findById(signUpRequest.getRoleId())
+                .orElseThrow(() -> new CustomedRoleNotFoundException("Role with id = " + signUpRequest.getRoleId() + "does not exist")));
+
+        if (signUpRequest.getFacultyId() != 0) {
+            user.setFaculty(facultyRepository.findById(signUpRequest.getFacultyId())
+                    .orElseThrow(() -> new FacultyNotFoundException(
+                            "Faculty with id = '" + signUpRequest.getFacultyId() +
+                                    "' does not exist"
+                    )));
+        } else {
+            user.setFaculty(null);
+        }
 
         user.setFullName(signUpRequest.getFullName());
 
@@ -109,28 +107,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailsResponse update(UserUpdateRequest userUpdateRequest) {
+    public SingleUserDetailsResponse update(UserUpdateRequest userUpdateRequest) {
         Long id = userUpdateRequest.getId();
 
         User foundUser = userRepository.findById(id).orElseThrow(() ->
                 new UserNotFoundException("User with id = " + id + " can not be found!"));
-        foundUser.setRoles(new HashSet<>(Collections.singletonList(getRoleFromDb(userUpdateRequest.getRole()))));
+        foundUser.setRole(roleRepository.findById(userUpdateRequest.getRoleId())
+                .orElseThrow(() -> new CustomedRoleNotFoundException(String
+                        .format("Can not find role with id = '%d'.", userUpdateRequest.getRoleId()))));
         foundUser.setEmail(userUpdateRequest.getEmail());
-        foundUser.setFaculty(facultyRepository.findByName(userUpdateRequest.getFaculty())
-                .orElseThrow(() ->
-                        new FacultyNotFoundException("Faculty with name '"
-                                + userUpdateRequest.getFaculty() + "' does not exits")));
+
+        if (userUpdateRequest.getFacultyId() != 0) {
+            foundUser.setFaculty(facultyRepository.findById(userUpdateRequest.getFacultyId())
+                    .orElseThrow(() -> new FacultyNotFoundException(
+                            "Faculty with id = '" + userUpdateRequest.getFacultyId() +
+                                    "' does not exist"
+                    )));
+        } else {
+            foundUser.setFaculty(null);
+        }
+        foundUser.setFullName(userUpdateRequest.getFullName());
 
         userRepository.save(foundUser);
-        return convert(userRepository.save(foundUser));
+        return convertSingleUser(userRepository.save(foundUser));
     }
 
     @Override
-    public UserDetailsResponse findById(Long id) {
+    public SingleUserDetailsResponse findById(Long id) {
 
         User foundUser = userRepository.findById(id).orElseThrow(() ->
                 new UserNotFoundException("User with id = " + id + " can not be found!"));
-        return convert(foundUser);
+        return convertSingleUser(foundUser);
     }
 
     @Override
@@ -146,14 +153,13 @@ public class UserServiceImpl implements UserService {
         return convert(userRepository.findAllByIsDeletedFalse(pageable));
     }
 
-    private UserDetailsResponse convert(User user) {
-        UserDetailsResponse result = modelMapper
-                .map(user, UserDetailsResponse.class);
+    private SingleUserDetailsResponse convertSingleUser(User user) {
+        return modelMapper
+                .map(user, SingleUserDetailsResponse.class);
+    }
 
-        result.setRoleNames(user.getRoles().stream().
-                map(role -> role.getName().toString()).collect(Collectors.toSet()));
-
-        return result;
+    private UserInListResponse convertUserInList(User user) {
+        return modelMapper.map(user, UserInListResponse.class);
     }
 
     private Role getRoleFromDb(ERole eRole) {
@@ -167,7 +173,7 @@ public class UserServiceImpl implements UserService {
     private UsersPaginationResponse convert(Page<User> userPage) {
         UsersPaginationResponse result = modelMapper.map(userPage, UsersPaginationResponse.class);
         result.setContent(userPage.getContent().stream()
-                .map(this::convert).collect(Collectors.toList()));
+                .map(this::convertUserInList).collect(Collectors.toList()));
         return result;
     }
 

@@ -2,7 +2,7 @@ package com.hcmute.tlcn2021.controller;
 
 import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
-import com.hcmute.tlcn2021.payload.response.UserDetailsResponse;
+import com.hcmute.tlcn2021.payload.response.SingleUserDetailsResponse;
 import com.hcmute.tlcn2021.payload.response.UsersPaginationResponse;
 import com.hcmute.tlcn2021.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,25 +20,25 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDetailsResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<SingleUserDetailsResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
     @PutMapping
-    public ResponseEntity<UserDetailsResponse> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
+    public ResponseEntity<MessageResponse> update(@RequestBody UserUpdateRequest userUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK.value())
-                .body(userService.update(userUpdateRequest));
+                .body(new MessageResponse(String.format("User %s updated successfully!", userService.update(userUpdateRequest).getUsername())));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponse> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<MessageResponse> delete(@PathVariable Long id) {
         userService.deleteById(id);
         return ResponseEntity.ok(new MessageResponse("User with id '" + id
                 + "' was successfully deleted"));
     }
 
     @GetMapping
-    public ResponseEntity<UsersPaginationResponse> getAll(@PageableDefault(sort = "id") Pageable pageable) {
+    public ResponseEntity<UsersPaginationResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         return ResponseEntity.ok(userService.getPage(pageable));
     }
 }

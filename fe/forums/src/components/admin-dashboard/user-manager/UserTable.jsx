@@ -7,9 +7,11 @@ import queryParamUtils from "../../../utils/queryParamUtils";
 import { useHistory, useLocation } from "react-router-dom";
 import ConfirmationAlert from "../../ConfirmationAlert";
 
-const UserTable = () => {
+const UserTable = ({ openUpdatingModal }) => {
   // state to show or hide confirmation alert modal (for deleting user)
   const [confirmationAlertShow, setConfirmationAlertShow] = useState(false);
+  const [pageNumState, setPageNumState] = useState(1);
+
   <ConfirmationAlert
     isOpened={confirmationAlertShow}
     handleClose={() => setConfirmationAlertShow(false)}
@@ -20,7 +22,8 @@ const UserTable = () => {
       <ButtonActions
         service={userService}
         id={row?.id}
-        reloader={() => reload(pageNum)}
+        funcReload={() => reload(pageNumState)}
+        openUpdatingModal={openUpdatingModal}
       />
     );
   };
@@ -47,7 +50,7 @@ const UserTable = () => {
       text: "Faculty",
     },
     {
-      dataField: "roleNames",
+      dataField: "roleName",
       text: "Role",
     },
     {
@@ -57,26 +60,30 @@ const UserTable = () => {
     },
   ];
 
-  // get page num from the url query param
-  let pageNum = queryParamUtils.useQuery().get("page");
   let history = useHistory();
   const path = useLocation().pathname;
 
+  let pageNum = queryParamUtils.useQuery().get("page");
+  if (pageNum === null) pageNum = 1;
+
   const [tableData, setTableData] = useState(Object);
 
-  const reload = (pageNum, pageSize) => {
-    UserService.getAll(pageNum, pageSize).then((response) => {
-      setTableData(response?.data);
-
-      // set the url param to match the current page
-      history.push({ pathname: path, search: `?page=${pageNum}` });
-
-      // do recusion when return empty array
-      if (response?.data?.content?.length === 0 && pageNum > 1) {
-        reload(pageNum - 1, pageSize);
-      }
-    });
-    console.log(`reloaded with page = ${pageNum}`);
+  const reload = (num, size) => {
+    UserService.getAll(num, size)
+      .then((response) => {
+        pageNum =
+          pageNum > response.data.totalPages
+            ? response.data.totalPages
+            : response.data.number + 1;
+        setPageNumState(pageNum);
+        setTableData(response.data);
+        // set the url param to match the current page
+        history.push({
+          pathname: path,
+          search: `?page=${pageNum}`,
+        });
+      })
+      .catch((err) => {});
   };
 
   const handleTableChange = (type, { page, sizePerPage }) => {
@@ -84,13 +91,9 @@ const UserTable = () => {
   };
 
   useEffect(() => {
-    UserService.getAll(pageNum)
-      .then((response) => {
-        setTableData(response?.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    UserService.getAll(pageNum).then((res) => {
+      setTableData(res.data);
+    });
   }, [pageNum]);
 
   return (

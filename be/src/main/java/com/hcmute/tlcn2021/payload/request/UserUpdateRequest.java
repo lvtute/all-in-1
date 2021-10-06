@@ -1,10 +1,12 @@
 package com.hcmute.tlcn2021.payload.request;
 
-import com.hcmute.tlcn2021.enumeration.ERole;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -18,10 +20,11 @@ public class UserUpdateRequest {
     @Email
     private String email;
 
-    @NotBlank
-    private String faculty;
+    private long facultyId;
 
-    @NotNull
-    private ERole role;
+    private long roleId;
+
+    @NotBlank
+    private String fullName;
 
 }

@@ -43,11 +43,9 @@ public class User {
     @JoinColumn(name="faculty_id")
     private Faculty faculty;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Column(columnDefinition = "boolean default false")
     private boolean isDeleted;
