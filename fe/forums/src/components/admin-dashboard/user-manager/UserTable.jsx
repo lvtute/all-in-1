@@ -22,7 +22,7 @@ const UserTable = ({ openUpdatingModal }) => {
       <ButtonActions
         service={userService}
         id={row?.id}
-        funcReload={() => reload(pageNumState, 5)}
+        funcReload={() => reload(pageNumState)}
         openUpdatingModal={openUpdatingModal}
       />
     );
@@ -71,16 +71,10 @@ const UserTable = ({ openUpdatingModal }) => {
   const reload = (num, size) => {
     UserService.getAll(num, size)
       .then((response) => {
-        console.log(
-          `pageNumState = ${pageNumState}, totalPages = ${response.data?.totalPages}}`
-        );
-        console.log(response.data);
-        console.log(pageNum > response.data.totalPages);
         pageNum =
           pageNum > response.data.totalPages
             ? response.data.totalPages
-            : response.data?.number + 1;
-        console.log(`pageNum = ${pageNum}`);
+            : response.data.number + 1;
         setPageNumState(pageNum);
         setTableData(response.data);
         // set the url param to match the current page

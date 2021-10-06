@@ -7,7 +7,6 @@ import com.hcmute.tlcn2021.exception.CustomedRoleNotFoundException;
 import com.hcmute.tlcn2021.exception.FacultyNotFoundException;
 import com.hcmute.tlcn2021.exception.UserDeleteFailedException;
 import com.hcmute.tlcn2021.exception.UserNotFoundException;
-import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Role;
 import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.LoginRequest;
@@ -88,12 +87,16 @@ public class UserServiceImpl implements UserService {
 
         user.setRole(roleRepository.findById(signUpRequest.getRoleId())
                 .orElseThrow(() -> new CustomedRoleNotFoundException("Role with id = " + signUpRequest.getRoleId() + "does not exist")));
-        Faculty faculty = facultyRepository.findById(signUpRequest.getFacultyId())
-                .orElseThrow(() -> new FacultyNotFoundException(
-                        "Faculty with id = '" + signUpRequest.getFacultyId() +
-                                "' does not exist"
-                ));
-        user.setFaculty(faculty);
+
+        if (signUpRequest.getFacultyId() != 0) {
+            user.setFaculty(facultyRepository.findById(signUpRequest.getFacultyId())
+                    .orElseThrow(() -> new FacultyNotFoundException(
+                            "Faculty with id = '" + signUpRequest.getFacultyId() +
+                                    "' does not exist"
+                    )));
+        } else {
+            user.setFaculty(null);
+        }
 
         user.setFullName(signUpRequest.getFullName());
 
@@ -113,10 +116,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new CustomedRoleNotFoundException(String
                         .format("Can not find role with id = '%d'.", userUpdateRequest.getRoleId()))));
         foundUser.setEmail(userUpdateRequest.getEmail());
-        foundUser.setFaculty(facultyRepository.findById(userUpdateRequest.getFacultyId())
-                .orElseThrow(() ->
-                        new FacultyNotFoundException("Faculty with id = '"
-                                + userUpdateRequest.getFacultyId() + "' does not exits")));
+
+        if (userUpdateRequest.getFacultyId() != 0) {
+            foundUser.setFaculty(facultyRepository.findById(userUpdateRequest.getFacultyId())
+                    .orElseThrow(() -> new FacultyNotFoundException(
+                            "Faculty with id = '" + userUpdateRequest.getFacultyId() +
+                                    "' does not exist"
+                    )));
+        } else {
+            foundUser.setFaculty(null);
+        }
+        foundUser.setFullName(userUpdateRequest.getFullName());
 
         userRepository.save(foundUser);
         return convertSingleUser(userRepository.save(foundUser));

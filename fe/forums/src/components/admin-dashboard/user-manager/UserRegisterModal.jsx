@@ -6,22 +6,34 @@ import authenService from "../../../services/auth.service";
 import { toast } from "react-toastify";
 import { TOASTIFY_CONFIGS } from "../../../services/constants";
 import userService from "../../../services/user.service";
+import { useHistory } from "react-router";
 
 const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
   const [isSubmitButtonDisabled, setSubmitButtonDisabled] = useState(false);
 
-  const [userInfoObject, setUseInfoObject] = useState(Object);
+  const [userInfoObject, setUserInfoObject] = useState(Object);
 
-  useEffect(() => {
-    setUseInfoObject(null);
-  }, [id]);
+  const [selectedRoleId, setSelectedRoleId] = useState(0);
+  const [selectedFacultyId, setSelectedFacultyId] = useState(0);
+
+  const history = useHistory();
+
+
   useEffect(() => {
     if (isUpdating) {
       userService.getById(id).then((res) => {
-        setUseInfoObject(res.data);
+        setUserInfoObject(res.data);
+        setSelectedRoleId(res.data?.role?.id);
+        setSelectedFacultyId(res.data?.faculty?.id);
       });
     }
-  }, [isUpdating, id]);
+  }, [id, isUpdating, setSelectedRoleId, setSelectedFacultyId]);
+
+  useEffect(() => {
+    setUserInfoObject(null);
+    setSelectedRoleId(0);
+    setSelectedFacultyId(0);
+  }, [isOpened, setSelectedRoleId, setSelectedFacultyId]);
 
   useEffect(() => {
     facultyService.getAll().then((res) => setFacultyList(res.data));
@@ -35,6 +47,7 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+
     const formData = new FormData(e.target);
     const formDataObj = Object.fromEntries(formData.entries());
     setSubmitButtonDisabled(true);
@@ -44,6 +57,8 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
         toast.success(res.data.message, TOASTIFY_CONFIGS);
         onCloseFunction();
         setSubmitButtonDisabled(false);
+
+        history.go(0);        
       })
       .catch((err) => {
         setSubmitButtonDisabled(false);
@@ -54,7 +69,7 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
   const [roleList, setRoleList] = useState([]);
 
   // use this for onChange to prevent warning
-  const doNothing = (event) => {};
+  // const doNothing = (event) => {};
 
   return (
     <Modal
@@ -87,7 +102,7 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
               placeholder="Full name"
               name="fullName"
               defaultValue={userInfoObject ? userInfoObject.fullName : ""}
-              onChange={doNothing}
+              
             />
           </Form.Group>
           <Form.Row>
@@ -98,7 +113,7 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
                 placeholder="Enter email"
                 name="email"
                 defaultValue={userInfoObject ? userInfoObject.email : ""}
-                onChange={doNothing}
+          
               />
             </Form.Group>
             {
@@ -121,11 +136,16 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
           <Form.Row>
             <Form.Group as={Col} controlId="formGridRole">
               <Form.Label>Role</Form.Label>
+              {console.log(userInfoObject?.role?.id)}
               <Form.Control
                 as="select"
                 name="roleId"
-                defaultValue={userInfoObject ? userInfoObject?.faculty?.id : 1}
+                value={selectedRoleId}
+                onChange={(event) => {
+                  setSelectedRoleId(event.target.value);
+                }}
               >
+                <option value="">Choose role...</option>
                 {roleList?.map((role) => (
                   <option key={role.id} value={role.id}>
                     {role.name}
@@ -135,7 +155,15 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
             </Form.Group>
             <Form.Group as={Col} controlId="formGridFaculty">
               <Form.Label>Khoa</Form.Label>
-              <Form.Control as="select" name="facultyId">
+              <Form.Control
+                as="select"
+                name="facultyId"
+                value={selectedFacultyId}
+                onChange={(event) => {
+                  setSelectedFacultyId(event.target.value);
+                }}
+              >
+                <option value="">Choose faculty...</option>
                 {facultyList?.map((faculty) => (
                   <option key={faculty.id} value={faculty.id}>
                     {faculty.name}

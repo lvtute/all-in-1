@@ -20,10 +20,8 @@ public class UserUpdateRequest {
     @Email
     private String email;
 
-    @NotBlank
     private long facultyId;
 
-    @NotNull
     private long roleId;
 
     @NotBlank
