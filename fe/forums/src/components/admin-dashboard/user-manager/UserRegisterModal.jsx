@@ -136,7 +136,6 @@ const UserRegisterModal = ({ isOpened, isUpdating, onCloseFunction, id }) => {
           <Form.Row>
             <Form.Group as={Col} controlId="formGridRole">
               <Form.Label>Role</Form.Label>
-              {console.log(userInfoObject?.role?.id)}
               <Form.Control
                 as="select"
                 name="roleId"

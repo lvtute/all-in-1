@@ -68,15 +68,19 @@ public class UserServiceImpl implements UserService {
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+
+        String role = "";
+
+        Optional<?> optionalRoleString = userDetails.getAuthorities().stream().findAny();
+        if (optionalRoleString.isPresent()) {
+            role = optionalRoleString.get().toString();
+        }
 
         return new JwtResponse(jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                roles);
+                role);
     }
 
     @Override
