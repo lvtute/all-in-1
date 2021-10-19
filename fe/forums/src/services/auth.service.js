@@ -1,23 +1,24 @@
 import http from "./http-common";
 
+const API_URL = "/auth/";
+
 const register = (signUpRequestObject) => {
-  return http.post("/auth/sign-up", signUpRequestObject);
+  return http.post(API_URL + "sign-up", signUpRequestObject);
 };
 
-// const login = (username, password) => {
-//   return http
-//     .post(API_URL + "signin", {
-//       username,
-//       password,
-//     })
-//     .then((response) => {
-//       if (response.data.accessToken) {
-//         localStorage.setItem("user", JSON.stringify(response.data));
-//       }
-
-//       return response.data;
-//     });
-// };
+const login = (username, password) => {
+  return http
+    .post(API_URL + "sign-in", {
+      username,
+      password,
+    })
+    .then((response) => {
+      if (response.data.token) {
+        localStorage.setItem("user", JSON.stringify(response.data));
+      }
+      return response.data;
+    });
+};
 
 const logout = () => {
   localStorage.removeItem("user");
@@ -29,9 +30,9 @@ const getCurrentUser = () => {
 
 const authenService = {
   register,
-  // login,
+  login,
   logout,
-  getCurrentUser,
+  getCurrentUser
 };
 
 export default authenService;

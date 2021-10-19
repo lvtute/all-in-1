@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import UserService from "../../../services/user.service";
 import ButtonActions from "../ButtonActions";
 import userService from "../../../services/user.service";
-import queryParamUtils from "../../../utils/queryParamUtils";
+import queryParamUtils from "../../../common/queryParamUtils";
 import { useHistory, useLocation } from "react-router-dom";
 import ConfirmationAlert from "../../ConfirmationAlert";
 
