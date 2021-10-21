@@ -34,5 +34,31 @@ INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VAL
 INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('fletcher.flosi@yahoo.com', @pw, 'fletcher.flosi', 'Fletcher Flosi', 2);
 INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('yuki_whobrey@aol.com', @pw, 'yuki_whobrey', 'Yuki Whobrey', 3);
 
+INSERT INTO topic(name, faculty_id) VALUES ('Học tập của SV  - Đăng ký MH', 1);
+INSERT INTO topic(name, faculty_id) VALUES ('Nghiên cứu khoa học sinh viên', 1);
+INSERT INTO topic(name, faculty_id) VALUES ('Điểm rèn luyện - Học bổng', 1);
+INSERT INTO topic(name, faculty_id) VALUES ('Công tác SV - Chế độ chính sách - K.CNTT', 1);
+INSERT INTO topic(name, faculty_id) VALUES ('Các vấn đề chung trong khoa CNTT', 1);
+INSERT INTO topic(name, faculty_id) VALUES ('Ngành Công nghệ Thông tin', 1);
+INSERT INTO topic(name, faculty_id) VALUES ('Ngành Kỹ thuật Dữ liệu', 1);
+
+INSERT INTO topic(name, faculty_id) VALUES ('Các vấn đề chung trong khoa CKM', 2);
+INSERT INTO topic(name, faculty_id) VALUES ('Nghiên cứu khoa học sinh viên', 2);
+INSERT INTO topic(name, faculty_id) VALUES ('Trợ giảng, Thỉnh giảng, đăng ký môn học CKM', 2);
+INSERT INTO topic(name, faculty_id) VALUES ('Công tác SV - Chế độ chính sách - K.CKM', 2);
+INSERT INTO topic(name, faculty_id) VALUES ('Ngành Công nghệ Chế biến Gỗ', 2);
+INSERT INTO topic(name, faculty_id) VALUES ('Ngành CN Kỹ thuật Cơ khí', 2);
+INSERT INTO topic(name, faculty_id) VALUES ('Ngành CN Kỹ thuật Cơ điện tử', 2);
+INSERT INTO topic(name, faculty_id) VALUES ('Tuyển sinh', 2);
+
+INSERT INTO topic(name, faculty_id) VALUES ('Các vấn đề chung trong khoa CN May TT', 3);
+INSERT INTO topic(name, faculty_id) VALUES ('Nghiên cứu khoa học Sinh viên', 3);
+INSERT INTO topic(name, faculty_id) VALUES ('Công tác SV - Chế độ chính sách - K.CNMTT', 3);
+INSERT INTO topic(name, faculty_id) VALUES ('Ngành Thiết kế Thời Trang', 3);
+INSERT INTO topic(name, faculty_id) VALUES ('Ngành Công nghệ May', 3);
+INSERT INTO topic(name, faculty_id) VALUES ('Tuyển sinh', 3);
+INSERT INTO topic(name, faculty_id) VALUES ('Trợ giảng, Thỉnh giảng, đăng ký môn học CNMTT', 3);
+
+
 
 
