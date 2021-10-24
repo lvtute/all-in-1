@@ -1,7 +1,10 @@
+* {
+  font-family: "Lora", serif;
+}
+
 tr {
   table-layout: fixed;
   overflow-x: auto;
-
 }
 td {
   word-wrap: break-word;
@@ -23,4 +26,28 @@ td {
 .left-title {
   margin: 2rem auto;
   color: #002f6c;
+}
+
+.question-subtitle {
+  color: #6c757d;
+  font-size: 70% !important;
+  margin-top: auto !important;
+  font-style: italic;
+}
+
+.question-subtitle span {
+  font-style: normal;
+}
+.card-title.h5 {
+  margin-bottom: 0.1% !important;
+  color: #0d47a1;
+}
+.card {
+  margin-bottom: 0.2%;
+}
+.card:hover {
+  background-color: #e3f2fd;
+}
+.MuiPagination-root.my-3 {
+  margin: 0 !important;
 }

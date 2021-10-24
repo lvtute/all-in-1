@@ -1,6 +1,7 @@
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../actions/auth";
+import { HOME_PATH } from "../services/constants";
 
 const NavigationBar = () => {
   const { isLoggedIn, user } = useSelector((state) => state.auth);
@@ -15,7 +16,7 @@ const NavigationBar = () => {
       variant="dark"
       style={{ marginBottom: "20px", paddingLeft: "10%", paddingRight: "10%" }}
     >
-      <Navbar.Brand href="#home">Trang chủ</Navbar.Brand>
+      <Navbar.Brand href={HOME_PATH}>Trang chủ</Navbar.Brand>
       <Nav className="mr-auto">
         <Nav.Link href="#datcauhoi">Đặt câu hỏi</Nav.Link>
       </Nav>
