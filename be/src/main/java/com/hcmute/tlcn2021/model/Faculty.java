@@ -23,4 +23,12 @@ public class Faculty {
     @OneToMany(mappedBy="faculty", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<User> users;
+
+    @OneToMany(mappedBy="faculty", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Topic> topic;
+
+    @OneToMany(mappedBy="faculty", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Question> question;
 }

@@ -1,5 +1,6 @@
 package com.hcmute.tlcn2021.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -39,6 +40,9 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDeleted;
+
     @ManyToOne
     @JoinColumn(name="faculty_id")
     private Faculty faculty;
@@ -47,8 +51,15 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @Column(columnDefinition = "boolean default false")
-    private boolean isDeleted;
+    @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Answer> answer;
+
+//    @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
+//    @JsonIgnore
+//    private Set<Question> question;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    private Set<User_ques> userQuesList;
 
     public User() {
     }
