@@ -3,13 +3,11 @@ package com.hcmute.tlcn2021.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -59,7 +57,7 @@ public class User {
 //    @JsonIgnore
 //    private Set<Question> question;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    private Set<User_ques> userQuesList;
+    private Set<UserQuestion> userQuesList;
 
     public User() {
     }

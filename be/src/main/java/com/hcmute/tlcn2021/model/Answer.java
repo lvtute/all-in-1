@@ -23,28 +23,28 @@ public class Answer {
 
     @NotBlank
     @Column(name = "is_deleted")
-    private boolean is_deleted;
+    private boolean isDeleted;
 
     @NotBlank
     @Column(name = "write_date")
-    private Date write_date;
+    private Date writeDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name="ques_id")
+    @JoinColumn(name="question_id")
     private Question question;
 
 
     public Answer() {
     }
 
-    public Answer(Long id, String content, boolean is_deleted, Date write_date) {
+    public Answer(Long id, String content, boolean isDeleted, Date writeDate) {
         this.id = id;
         this.content = content;
-        this.is_deleted = is_deleted;
-        this.write_date = write_date;
+        this.isDeleted = isDeleted;
+        this.writeDate = writeDate;
     }
 }

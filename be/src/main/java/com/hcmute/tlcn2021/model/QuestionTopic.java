@@ -9,14 +9,14 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "ques_topic")
-public class Ques_topic {
+public class QuestionTopic {
     @EmbeddedId
-    Question_Topic_Key id;
+    QuestionTopicKey id;
 
 
     @ManyToOne
-    @MapsId("ques_id")
-    @JoinColumn(name = "ques_id")
+    @MapsId("question_id")
+    @JoinColumn(name = "question_id")
     private Question question;
 
     @ManyToOne
@@ -24,6 +24,6 @@ public class Ques_topic {
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
-    public Ques_topic() {
+    public QuestionTopic() {
     }
 }

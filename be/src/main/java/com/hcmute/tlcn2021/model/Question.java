@@ -10,7 +10,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -28,8 +27,8 @@ public class Question {
     private String email;
 
     @NotBlank
-    @Column(name = "name_user")
-    private String name_user;
+    @Column(name = "user_name")
+    private String userName;
 
     @NotBlank
     private String title;
@@ -41,21 +40,21 @@ public class Question {
     @Column(name = "write_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date write_date;
+    private Date writeDate;
 
     @NotBlank
     @Column(name = "modify_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date modify_date;
+    private Date modifyDate;
 
     @NotBlank
     @Column(name = "is_answered")
-    private boolean is_answered;
+    private boolean isAnswered;
 
     @NotBlank
     @Column(name = "is_deleted")
-    private boolean is_deleted;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "faculty_id")
@@ -70,9 +69,9 @@ public class Question {
     private Set<Answer> answer;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "question")
-    private Set<Ques_topic> quesTopicList;
+    private Set<QuestionTopic> quesTopicList;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "question")
-    private Set<User_ques> quesUserList;
+    private Set<UserQuestion> quesUserList;
 
 }
