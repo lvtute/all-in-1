@@ -49,11 +49,11 @@ public class Question {
     private Date modifyDate;
 
     @NotBlank
-    @Column(name = "is_answered")
+    @Column(name = "is_answered",columnDefinition = "boolean default false")
     private boolean isAnswered;
 
     @NotBlank
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted",columnDefinition = "boolean default false")
     private boolean isDeleted;
 
     @ManyToOne

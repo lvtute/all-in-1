@@ -8,11 +8,11 @@ INSERT INTO faculty(name) VALUES('Công nghệ thông tin');
 INSERT INTO faculty(name) VALUES('Cơ khí chế tạo máy');
 INSERT INTO faculty(name) VALUES('Công nghệ may và thiết kế thời trang');
 
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (1, 'tranvanc@gmail.com', @pw, 'mod1', 'Tran Van C', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (1, 'tranvanc@gmail.com', @pw, 'mod1', N'Trần Văn Nam', 1, 1);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (2, 'nguyenvana@gmail.com', @pw, 'mod2', 'Nguyen Van A', 2, 2);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `role_id`) VALUES (3, 'admin@gmail.com', @pw, 'admin', 'Luong Van Thuan', 3);
 
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('jbutt@gmail.com', @pw, 'jamesbutt', 'James Butt', 1);
+INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('jbutt@gmail.com', @pw, 'jamesbutt', N'James Butt', 1);
 INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('josephine_darakjy@darakjy.org', @pw, 'josephine_darakjy', 'Josephine Darakjy', 2);
 INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('art@venere.org', @pw, 'art', 'Art	Venere', 3);
 INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('lpaprocki@hotmail.com', @pw, 'lpaprocki', 'Lenna Paprocki', 1);

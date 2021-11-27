@@ -22,7 +22,7 @@ public class Topic {
     private String nameTopic;
 
     @NotBlank
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted",columnDefinition = "boolean default false")
     private boolean isDeleted;
 
     @ManyToOne
