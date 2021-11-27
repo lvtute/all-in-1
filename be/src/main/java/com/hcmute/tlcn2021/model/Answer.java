@@ -3,6 +3,7 @@ package com.hcmute.tlcn2021.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -27,6 +28,8 @@ public class Answer {
 
     @NotBlank
     @Column(name = "write_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private Date writeDate;
 
     @ManyToOne
