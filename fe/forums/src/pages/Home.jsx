@@ -33,7 +33,7 @@ const Home = () => {
 
   useEffect(() => {
     questionService
-      .getAll({ page, size })
+      .getAll({ page: page - 1, size })
       .then((res) => {
         console.log(res.data);
         setTotalPages(res.data?.totalPages);
@@ -52,7 +52,6 @@ const Home = () => {
 
   const handlePageSizeChange = (event) => {
     setSize(event.target.value);
-    setPage(1);
   };
 
   return (
@@ -133,8 +132,6 @@ const Home = () => {
               className="my-3"
               count={totalPages}
               page={page}
-              siblingCount={1}
-              boundaryCount={1}
               variant="outlined"
               shape="rounded"
               onChange={handlePageChange}
