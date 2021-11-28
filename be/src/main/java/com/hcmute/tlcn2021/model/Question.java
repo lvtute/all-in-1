@@ -1,5 +1,6 @@
 package com.hcmute.tlcn2021.model;
 
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import javax.persistence.ManyToOne;
 @Getter
 @Setter
 @Entity
+@Table
 public class Question extends BaseEntity{
 
     private String title;
@@ -33,5 +35,6 @@ public class Question extends BaseEntity{
     @ManyToOne
     @JoinColumn(name="advisor_id")
     private User user;
+
 
 }
