@@ -1,6 +1,5 @@
 package com.hcmute.tlcn2021.payload.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
