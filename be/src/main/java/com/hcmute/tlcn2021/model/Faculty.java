@@ -24,7 +24,4 @@ public class Faculty {
     @JsonIgnore
     private Set<User> users;
 
-    @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Topic> topics;
 }
