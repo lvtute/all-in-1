@@ -1,7 +1,5 @@
 import { Slide } from "react-toastify";
 
-// ADMIN PATHS
-export const USER_MANAGEMENT_PATH = "/admin/user";
 
 export const TOASTIFY_CONFIGS = {
   position: "top-right",
@@ -13,3 +11,10 @@ export const TOASTIFY_CONFIGS = {
   progress: undefined,
   transition: Slide,
 };
+export const HOME_PATH = "/home";
+export const ADMIN_PATH = "/admin";
+export const LOGIN_PATH = "/login";
+
+export const USER_SUB_PATH = "/user";
+// ADMIN PATHS
+export const USER_MANAGEMENT_PATH = ADMIN_PATH + USER_SUB_PATH;

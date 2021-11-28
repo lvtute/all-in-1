@@ -3,9 +3,9 @@ package com.hcmute.tlcn2021.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -24,11 +24,4 @@ public class Faculty {
     @JsonIgnore
     private Set<User> users;
 
-    @OneToMany(mappedBy="faculty", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<Topic> topic;
-
-    @OneToMany(mappedBy="faculty", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<Question> question;
 }

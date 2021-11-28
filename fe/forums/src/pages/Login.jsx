@@ -5,6 +5,7 @@ import { Redirect, useHistory } from "react-router-dom";
 import { useState } from "react";
 
 import { login } from "../actions/auth";
+import { HOME_PATH } from "../services/constants";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const Login = () => {
 
     dispatch(login(username, password))
       .then(() => {
-        history.push("/");
+        history.push({ HOME_PATH });
         // window.location.reload();
       })
       .catch(() => {
@@ -31,7 +32,7 @@ const Login = () => {
   };
 
   if (isLoggedIn) {
-    return <Redirect to="/" />;
+    return <Redirect to={ HOME_PATH } />;
   }
 
   return (

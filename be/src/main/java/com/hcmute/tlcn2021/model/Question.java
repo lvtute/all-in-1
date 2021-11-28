@@ -1,77 +1,40 @@
 package com.hcmute.tlcn2021.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.util.Date;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Getter
 @Setter
 @Entity
 @Table
-public class Question {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Question extends BaseEntity{
 
-    @NotBlank
-    @Size(max = 50)
-    @Email
-    private String email;
-
-    @NotBlank
-    @Column(name = "user_name")
-    private String userName;
-
-    @NotBlank
     private String title;
 
-    @NotBlank
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @NotBlank
-    @Column(name = "write_date", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date writeDate;
+    private String name;
 
-    @NotBlank
-    @Column(name = "modify_date", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date modifyDate;
-
-    @NotBlank
-    @Column(name = "is_answered",columnDefinition = "boolean default false")
-    private boolean isAnswered;
-
-    @NotBlank
-    @Column(name = "is_deleted",columnDefinition = "boolean default false")
-    private boolean isDeleted;
+    private String email;
 
     @ManyToOne
-    @JoinColumn(name = "faculty_id")
+    @JoinColumn(name="faculty_id")
     private Faculty faculty;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name="topic_id")
+    private Topic topic;
 
-    @OneToMany(mappedBy="question", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<Answer> answer;
+    @ManyToOne
+    @JoinColumn(name="advisor_id")
+    private User user;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "question")
-    private Set<QuestionTopic> quesTopicList;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "question")
-    private Set<UserQuestion> quesUserList;
 
 }
