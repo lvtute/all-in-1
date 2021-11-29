@@ -3,6 +3,7 @@ package com.hcmute.tlcn2021.payload.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -20,6 +21,7 @@ public class QuestionCreationRequest {
     private String name;
 
     @NotBlank(message = "Vui lòng điền địa chỉ email của bạn")
+    @Email(message = "Địa chỉ email không hợp lệ")
     private String email;
 
     @NotNull(message = "Vui lòng chọn khoa")

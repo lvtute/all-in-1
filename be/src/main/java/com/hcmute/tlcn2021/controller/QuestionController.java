@@ -26,8 +26,7 @@ public class QuestionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody @Valid QuestionCreationRequest request) {
-//        questionService.create(ques)
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Long> create(@RequestBody @Valid QuestionCreationRequest request) {
+        return ResponseEntity.ok(questionService.create(request));
     }
 }
