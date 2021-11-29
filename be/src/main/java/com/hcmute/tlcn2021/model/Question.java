@@ -1,6 +1,5 @@
 package com.hcmute.tlcn2021.model;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,5 +31,7 @@ public class Question extends BaseEntity{
     @ManyToOne
     @JoinColumn(name="advisor_id")
     private User user;
+
+    private Boolean agreeToReceiveEmailNotification;
 
 }
