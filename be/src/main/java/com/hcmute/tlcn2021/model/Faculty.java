@@ -23,5 +23,6 @@ public class Faculty {
     @OneToMany(mappedBy="faculty", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<User> users;
-
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDeleted;
 }
