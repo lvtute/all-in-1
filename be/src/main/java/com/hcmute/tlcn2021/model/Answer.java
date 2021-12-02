@@ -8,7 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
-@Table
 @Data
 @AllArgsConstructor
 public class Answer extends BaseEntity {

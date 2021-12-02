@@ -42,9 +42,12 @@ public class User {
     @JsonIgnore
     private Set<Answer> answer;
 
-//    @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private Set<Question> question;
+    @ManyToMany
+    @JoinTable(
+            name = "user_topic",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "topic_id"))
+    Set<Topic> topics;
 
     public User() {
     }

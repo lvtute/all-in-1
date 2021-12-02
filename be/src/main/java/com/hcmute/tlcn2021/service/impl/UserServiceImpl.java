@@ -18,6 +18,7 @@ import com.hcmute.tlcn2021.repository.RoleRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
 import com.hcmute.tlcn2021.service.UserService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -56,8 +58,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FacultyRepository facultyRepository;
 
+    @PostConstruct
+    private void postConstruct() {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
+    }
+
     @Override
     public JwtResponse signIn(LoginRequest loginRequest) {
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                         loginRequest.getPassword()));
@@ -161,14 +169,6 @@ public class UserServiceImpl implements UserService {
 
     private UserInListResponse convertUserInList(User user) {
         return modelMapper.map(user, UserInListResponse.class);
-    }
-
-    private Role getRoleFromDb(ERole eRole) {
-
-        Optional<Role> role = roleRepository.findByName(eRole);
-        return role.orElseThrow(() -> new CustomedRoleNotFoundException(
-                "Can not find role '" + eRole.toString() + "' in the database"
-        ));
     }
 
     private UsersPaginationResponse convert(Page<User> userPage) {

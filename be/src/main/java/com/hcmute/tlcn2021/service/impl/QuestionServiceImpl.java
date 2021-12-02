@@ -11,7 +11,6 @@ import com.hcmute.tlcn2021.repository.TopicRepository;
 import com.hcmute.tlcn2021.service.QuestionService;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,7 +53,7 @@ public class QuestionServiceImpl implements QuestionService {
                     HttpStatus.BAD_REQUEST);
         }
         Question savedQuestion = questionRepository.save(toBeSavedQuestion);
-        log.info("questionService: Question saved successfully!");
+        log.info("Question saved successfully!");
         return savedQuestion.getId();
     }
 

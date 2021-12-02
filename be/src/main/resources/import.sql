@@ -1,66 +1,95 @@
 SET @pw = '$2a$12$QNvN/tk6gimZC.9i/OqW5uxKYH7BTGc5x3B1ET2fzA4Q.Y9/foTlS'
 
-INSERT INTO role(name) VALUES('ROLE_ADVISER');
-INSERT INTO role(name) VALUES('ROLE_DEAN');
-INSERT INTO role(name) VALUES('ROLE_ADMIN');
+INSERT INTO role(id, name) VALUES(1, 'ROLE_ADVISER');
+INSERT INTO role(id, name) VALUES(2, 'ROLE_DEAN');
+INSERT INTO role(id, name) VALUES(3, 'ROLE_ADMIN');
 
 INSERT INTO faculty(name) VALUES('Công nghệ thông tin');
 INSERT INTO faculty(name) VALUES('Cơ khí chế tạo máy');
 INSERT INTO faculty(name) VALUES('Công nghệ may và thiết kế thời trang');
 
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (1, 'tranvanc@gmail.com', @pw, 'mod1', N'Trần Văn Nam', 1, 1);
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (2, 'nguyenvana@gmail.com', @pw, 'mod2', 'Nguyen Van A', 2, 2);
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `role_id`) VALUES (3, 'admin@gmail.com', @pw, 'admin', 'Luong Van Thuan', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (1, 'Học tập của SV  - Đăng ký MH', 1);
+INSERT INTO topic(id, name, faculty_id) VALUES (2, 'Nghiên cứu khoa học sinh viên', 1);
+INSERT INTO topic(id, name, faculty_id) VALUES (3, 'Điểm rèn luyện - Học bổng', 1);
+INSERT INTO topic(id, name, faculty_id) VALUES (4, 'Công tác SV - Chế độ chính sách - K.CNTT', 1);
+INSERT INTO topic(id, name, faculty_id) VALUES (5, 'Các vấn đề chung trong khoa CNTT', 1);
+INSERT INTO topic(id, name, faculty_id) VALUES (6, 'Ngành Công nghệ Thông tin', 1);
+INSERT INTO topic(id, name, faculty_id) VALUES (7, 'Ngành Kỹ thuật Dữ liệu', 1);
 
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('jbutt@gmail.com', @pw, 'jamesbutt', N'James Butt', 1);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('josephine_darakjy@darakjy.org', @pw, 'josephine_darakjy', 'Josephine Darakjy', 2);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('art@venere.org', @pw, 'art', 'Art	Venere', 3);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('lpaprocki@hotmail.com', @pw, 'lpaprocki', 'Lenna Paprocki', 1);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('donette.foller@cox.net', @pw, 'donette.foller', 'Donette Foller', 2);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('simona@morasca.com', @pw, 'simona', 'Simona Morasca', 3);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('sage_wieser@cox.net', @pw, 'sage_wieser', 'Sage Wieser', 1);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('leota@hotmail.com', @pw, 'leota', 'Leota Dilliard', 2);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('mitsue_tollner@yahoo.com', @pw, 'mitsue_tollner', 'Mitsue Tollner', 3);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('amaclead@gmail.com', @pw, 'amaclead', 'Abel Maclead', 1);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('minna_amigon@yahoo.com', @pw, 'minna_amigon', 'Minna Amigon', 2);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('kris@gmail.com', @pw, 'kris', 'Kris Marrier', 3);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('calbares@gmail.com', @pw, 'calbares', 'Cammy Albares', 1);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('gruta@cox.net', @pw, 'gruta', 'Graciela Ruta', 2);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('kiley.caldarera@aol.com', @pw, 'kiley.caldarera', 'Kiley Caldarera', 3);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('gladys.rim@rim.org', @pw, 'gladys.rim', 'Gladys Rim', 1);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('meaghan@hotmail.com', @pw, 'meaghan', 'Meaghan Garufi', 2);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('mattie@aol.com', @pw, 'mattie', 'Mattie Poquette', 3);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('bette_nicka@cox.net', @pw, 'bette_nicka', 'Bette Nicka', 1);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('fletcher.flosi@yahoo.com', @pw, 'fletcher.flosi', 'Fletcher Flosi', 2);
-INSERT INTO user(`email`, `password`, `username`, `full_name`, `faculty_id`) VALUES ('yuki_whobrey@aol.com', @pw, 'yuki_whobrey', 'Yuki Whobrey', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (8, 'Các vấn đề chung trong khoa CKM', 2);
+INSERT INTO topic(id, name, faculty_id) VALUES (9, 'Nghiên cứu khoa học sinh viên', 2);
+INSERT INTO topic(id, name, faculty_id) VALUES (10, 'Trợ giảng, Thỉnh giảng, đăng ký môn học CKM', 2);
+INSERT INTO topic(id, name, faculty_id) VALUES (11, 'Công tác SV - Chế độ chính sách - K.CKM', 2);
+INSERT INTO topic(id, name, faculty_id) VALUES (12, 'Ngành Công nghệ Chế biến Gỗ', 2);
+INSERT INTO topic(id, name, faculty_id) VALUES (13, 'Ngành CN Kỹ thuật Cơ khí', 2);
+INSERT INTO topic(id, name, faculty_id) VALUES (14, 'Ngành CN Kỹ thuật Cơ điện tử', 2);
+INSERT INTO topic(id, name, faculty_id) VALUES (15, 'Tuyển sinh', 2);
 
-INSERT INTO topic(name, faculty_id) VALUES ('Học tập của SV  - Đăng ký MH', 1);
-INSERT INTO topic(name, faculty_id) VALUES ('Nghiên cứu khoa học sinh viên', 1);
-INSERT INTO topic(name, faculty_id) VALUES ('Điểm rèn luyện - Học bổng', 1);
-INSERT INTO topic(name, faculty_id) VALUES ('Công tác SV - Chế độ chính sách - K.CNTT', 1);
-INSERT INTO topic(name, faculty_id) VALUES ('Các vấn đề chung trong khoa CNTT', 1);
-INSERT INTO topic(name, faculty_id) VALUES ('Ngành Công nghệ Thông tin', 1);
-INSERT INTO topic(name, faculty_id) VALUES ('Ngành Kỹ thuật Dữ liệu', 1);
+INSERT INTO topic(id, name, faculty_id) VALUES (16, 'Các vấn đề chung trong khoa CN May TT', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (17, 'Nghiên cứu khoa học Sinh viên', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (18, 'Công tác SV - Chế độ chính sách - K.CNMTT', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (19, 'Ngành Thiết kế Thời Trang', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (20, 'Ngành Công nghệ May', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (21, 'Tuyển sinh', 3);
+INSERT INTO topic(id, name, faculty_id) VALUES (22, 'Trợ giảng, Thỉnh giảng, đăng ký môn học CNMTT', 3);
 
-INSERT INTO topic(name, faculty_id) VALUES ('Các vấn đề chung trong khoa CKM', 2);
-INSERT INTO topic(name, faculty_id) VALUES ('Nghiên cứu khoa học sinh viên', 2);
-INSERT INTO topic(name, faculty_id) VALUES ('Trợ giảng, Thỉnh giảng, đăng ký môn học CKM', 2);
-INSERT INTO topic(name, faculty_id) VALUES ('Công tác SV - Chế độ chính sách - K.CKM', 2);
-INSERT INTO topic(name, faculty_id) VALUES ('Ngành Công nghệ Chế biến Gỗ', 2);
-INSERT INTO topic(name, faculty_id) VALUES ('Ngành CN Kỹ thuật Cơ khí', 2);
-INSERT INTO topic(name, faculty_id) VALUES ('Ngành CN Kỹ thuật Cơ điện tử', 2);
-INSERT INTO topic(name, faculty_id) VALUES ('Tuyển sinh', 2);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `role_id`) VALUES (1, 'admin@gmail.com', @pw, 'admin', 'Luong Van Thuan', 3);
 
-INSERT INTO topic(name, faculty_id) VALUES ('Các vấn đề chung trong khoa CN May TT', 3);
-INSERT INTO topic(name, faculty_id) VALUES ('Nghiên cứu khoa học Sinh viên', 3);
-INSERT INTO topic(name, faculty_id) VALUES ('Công tác SV - Chế độ chính sách - K.CNMTT', 3);
-INSERT INTO topic(name, faculty_id) VALUES ('Ngành Thiết kế Thời Trang', 3);
-INSERT INTO topic(name, faculty_id) VALUES ('Ngành Công nghệ May', 3);
-INSERT INTO topic(name, faculty_id) VALUES ('Tuyển sinh', 3);
-INSERT INTO topic(name, faculty_id) VALUES ('Trợ giảng, Thỉnh giảng, đăng ký môn học CNMTT', 3);
+-- IT Users
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (2, 'tranvanc@gmail.com', @pw, 'mod1', N'Trần Văn Nam', 1, 2);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (3, 'nguyenvana@gmail.com', @pw, 'mod2', 'Nguyen Van A', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (4, 'jbutt@gmail.com', @pw, 'jamesbutt', N'James Butt', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (5, 'josephine_darakjy@darakjy.org', @pw, 'josephine_darakjy', 'Josephine Darakjy', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (6, 'art@venere.org', @pw, 'art', 'Art	Venere', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (7, 'lpaprocki@hotmail.com', @pw, 'lpaprocki', 'Lenna Paprocki', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (8, 'donette.foller@cox.net', @pw, 'donette.foller', 'Donette Foller', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (9, 'simona@morasca.com', @pw, 'simona', 'Simona Morasca', 1, 1);
+-- CKM
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (10, 'sage_wieser@cox.net', @pw, 'sage_wieser', 'Sage Wieser', 2, 2);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (11, 'leota@hotmail.com', @pw, 'leota', 'Leota Dilliard', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (12, 'mitsue_tollner@yahoo.com', @pw, 'mitsue_tollner', 'Mitsue Tollner', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (13, 'amaclead@gmail.com', @pw, 'amaclead', 'Abel Maclead', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (14, 'minna_amigon@yahoo.com', @pw, 'minna_amigon', 'Minna Amigon', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (15, 'kris@gmail.com', @pw, 'kris', 'Kris Marrier', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (16, 'calbares@gmail.com', @pw, 'calbares', 'Cammy Albares', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (17, 'gruta@cox.net', @pw, 'gruta', 'Graciela Ruta', 2, 1);
+-- CNMTT
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (18, 'kiley.caldarera@aol.com', @pw, 'kiley.caldarera', 'Kiley Caldarera', 3, 2);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (19, 'gladys.rim@rim.org', @pw, 'gladys.rim', 'Gladys Rim', 3, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (20, 'meaghan@hotmail.com', @pw, 'meaghan', 'Meaghan Garufi', 3, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (21, 'mattie@aol.com', @pw, 'mattie', 'Mattie Poquette', 3, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (22, 'bette_nicka@cox.net', @pw, 'bette_nicka', 'Bette Nicka', 3, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (23, 'fletcher.flosi@yahoo.com', @pw, 'fletcher.flosi', 'Fletcher Flosi', 3, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (24, 'yuki_whobrey@aol.com', @pw, 'yuki_whobrey', 'Yuki Whobrey', 3, 1);
 
+-- user (3-9)_topic(1-7)
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (3, 1);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (4, 1);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (5, 2);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (6, 3);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (7, 4);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (8, 5);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (9, 5);
 
----- create a function to generate random datetime
+-- user 11-17 / topic 8-15
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (11, 8);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (12, 9);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (13, 10);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (14, 11);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (15, 12);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (16, 13);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (17, 14);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (17, 15);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (16, 15);
+
+-- user -19-24 / topic 16-22
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (19, 16);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (20, 17);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (21, 18);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (22, 19);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (23, 20);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (24, 21);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (24, 22);
 
 INSERT INTO question(title, content, name, email, faculty_id, topic_id, created_date) VALUES ('Đăng kí đề tài môn tiểu luận chuyên ngành', 'Theo thông báo của khoa thì từ 5-10 sẽ update link đăng ký đề tài trên trang dkdt.fit.hcmute.edu.vn. Nhưng hiện tại em vẫn chưa thấy ạ?','Nguyễn ĐÌnh Thượng Thượng', 'thuongndt@gmail.com', 1, 1, generateRandomDateTime());
 INSERT INTO question(title, content, name, email, faculty_id, topic_id, created_date) VALUES ('Hỏi thông tin liên lạc', 'Hiện tại em không có cách liên lạc với  thầy Nguyễn Trường Hải lớp Công nghệ phần mềm . Khoa có thể cho xin sđt hoặc email của thầy được không ạ. Em xin cảm ơn.', 'Trần Thái Nguyên', 'nguyentt@gmail.com', 1, 5, generateRandomDateTime());

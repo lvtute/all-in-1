@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table
 public class Question extends BaseEntity{
 
     private String title;
