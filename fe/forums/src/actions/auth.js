@@ -1,5 +1,5 @@
 /**
- * (register/login/logout actions)
+ * (login/logout actions)
  */
 
 import { LOGIN_SUCCESS, LOGOUT } from "./types";
