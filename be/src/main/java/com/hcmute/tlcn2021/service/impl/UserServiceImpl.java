@@ -58,10 +58,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FacultyRepository facultyRepository;
 
-    @PostConstruct
-    private void postConstruct() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
-    }
+//    @PostConstruct
+//    private void postConstruct() {
+//        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
+//    }
 
     @Override
     public JwtResponse signIn(LoginRequest loginRequest) {

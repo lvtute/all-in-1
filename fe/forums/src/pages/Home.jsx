@@ -12,11 +12,12 @@ const Home = () => {
 
   const [questionList, setQuestionList] = useState([]);
   const [isQuestionLoading, setQuestionLoadingStatus] = useState(true);
-  
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [size, setSize] = useState(1);
-  const sizes = [1, 5, 10];
+  const [size, setSize] = useState(5);
+  const [facultyId, setFacultyId] = useState(0);
+  const sizes = [5, 10];
 
   useEffect(() => {
     facultyService
@@ -33,7 +34,7 @@ const Home = () => {
 
   useEffect(() => {
     questionService
-      .getAll({ page: page - 1, size })
+      .getAll({ page: page - 1, size, facultyId })
       .then((res) => {
         console.log(res.data);
         setTotalPages(res.data?.totalPages);
@@ -44,7 +45,7 @@ const Home = () => {
         console.log(err);
         setQuestionLoadingStatus(false);
       });
-  }, [page, size]);
+  }, [page, size, facultyId]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -54,12 +55,22 @@ const Home = () => {
     setSize(event.target.value);
   };
 
+  const reloadQuestions = (event) => {
+    setFacultyId(event.target.value);
+    setPage(1);
+    setSize(5);
+  };
   return (
     <Container fluid>
       <Row>
         <Col md={2}>
           <ListGroup>
-            <ListGroup.Item action variant="light">
+            <ListGroup.Item
+              onClick={reloadQuestions}
+              value="0"
+              action
+              variant="light"
+            >
               Tất cả phòng ban
             </ListGroup.Item>
             {isFacultyLoading && (
@@ -70,7 +81,13 @@ const Home = () => {
               />
             )}
             {facultyList.map((faculty) => (
-              <ListGroup.Item key={faculty.id} action variant="light">
+              <ListGroup.Item
+                value={faculty.id}
+                onClick={reloadQuestions}
+                key={faculty.id}
+                action
+                variant="light"
+              >
                 {faculty.name}
               </ListGroup.Item>
             ))}
@@ -97,19 +114,12 @@ const Home = () => {
                   className="question-subtitle"
                   style={{ float: "right" }}
                 >
-                  256 lượt xem
+                  {`${question.views} lượt xem`}
                 </Card.Subtitle>
 
                 <Card.Subtitle className="question-subtitle">
                   đăng bởi: <span>{question.name}</span>- vào lúc{" "}
                   <span>{question.createdDate}</span>
-                </Card.Subtitle>
-
-                <Card.Subtitle
-                  className="question-subtitle"
-                  style={{ float: "right" }}
-                >
-                  chờ trả lời
                 </Card.Subtitle>
 
                 <Card.Subtitle className="question-subtitle">
@@ -119,7 +129,7 @@ const Home = () => {
               </Card.Body>
             </Card>
           ))}
-          <Row style={{float:"right" }} className="mt-3">
+          <Row style={{ float: "right" }} className="mt-3">
             {"size: "}
             <select onChange={handlePageSizeChange} value={size}>
               {sizes.map((size) => (

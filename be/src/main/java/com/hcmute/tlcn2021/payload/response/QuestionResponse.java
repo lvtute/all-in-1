@@ -26,4 +26,6 @@ public class QuestionResponse {
     private String topicName;
 
     private String createdDate;
+
+    private int views;
 }

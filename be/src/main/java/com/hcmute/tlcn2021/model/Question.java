@@ -31,6 +31,9 @@ public class Question extends BaseEntity{
     @JoinColumn(name="advisor_id")
     private User user;
 
+    @Column(columnDefinition = "integer default 0")
+    private int views;
+
     private Boolean agreeToReceiveEmailNotification;
 
 }
