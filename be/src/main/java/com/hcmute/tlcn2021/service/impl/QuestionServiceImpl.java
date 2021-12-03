@@ -8,6 +8,7 @@ import com.hcmute.tlcn2021.payload.response.QuestionResponse;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.repository.QuestionRepository;
 import com.hcmute.tlcn2021.repository.TopicRepository;
+import com.hcmute.tlcn2021.repository.UserRepository;
 import com.hcmute.tlcn2021.service.QuestionService;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -16,7 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -35,12 +38,16 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private TopicRepository topicRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Override
     public QuestionPaginationResponse findAll(Pageable pageable) {
         return convert(questionRepository.findAllByIsDeletedFalse(pageable));
     }
 
+    @Transactional
     @Override
     public Long create(QuestionCreationRequest request) {
         Question toBeSavedQuestion = modelMapper.map(request, Question.class);
@@ -52,6 +59,14 @@ public class QuestionServiceImpl implements QuestionService {
             throw new UteForumException("Chủ đề " + toBeSavedQuestion.getTopic().getName() + " không thuộc khoa " + toBeSavedQuestion.getFaculty().getName(),
                     HttpStatus.BAD_REQUEST);
         }
+
+        Optional<Long> optionalAdviserId = userRepository.findAdviserIdForAssigningQuestionByTopicId(toBeSavedQuestion.getTopic().getId());
+        Long adviserId = optionalAdviserId.orElseGet(() -> userRepository.findAdviserIdForAssigningQuestionByFaculty(toBeSavedQuestion.getFaculty().getId())
+                .orElseThrow(() -> new UteForumException("Không tìm được tư vấn viên phù hợp", HttpStatus.NOT_FOUND)));
+
+        toBeSavedQuestion.setUser(userRepository.findById(adviserId)
+                .orElseThrow(() -> new UteForumException("Không tìm được tư vấn viên phù hợp", HttpStatus.NOT_FOUND)));
+
         Question savedQuestion = questionRepository.save(toBeSavedQuestion);
         log.info("Question saved successfully!");
         return savedQuestion.getId();

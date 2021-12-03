@@ -1,6 +1,7 @@
 package com.hcmute.tlcn2021.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,10 +14,12 @@ import java.util.Set;
 public class Topic extends BaseEntity {
     private String name;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="faculty_id")
     private Faculty faculty;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "topics")
     Set<User> users;
 

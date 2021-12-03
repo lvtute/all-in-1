@@ -12,12 +12,15 @@ import { convertToHTML } from "draft-convert";
 import ValidationMessage from "../components/ValidationMessage";
 import { toast } from "react-toastify";
 import { TOASTIFY_CONFIGS } from "../services/constants";
+import { useHistory } from "react-router-dom";
+// import { HOME_PATH } from "../services/constants";
 
 const QuestionCreator = () => {
   const [faculties, setFaculties] = useState([]);
   const [topics, setTopics] = useState([]);
   const [errorResponse, setErrorResponse] = useState(Object);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const history = useHistory();
 
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -69,8 +72,7 @@ const QuestionCreator = () => {
     questionService
       .createQuestion(requestBody)
       .then((res) => {
-        console.log(res.data);
-        setErrorResponse({});
+        history.push("/home"); // HOME_PATH
         toast.success("Đặt câu hỏi thành công!", TOASTIFY_CONFIGS);
       })
       .catch((err) => {
@@ -157,7 +159,6 @@ const QuestionCreator = () => {
               editorClassName="editor-class"
               toolbarClassName="toolbar-class"
             />
-            {/* <ValidationMessage errorResponse={errorResponse} field="content" /> */}
           </Form.Row>
 
           <Form.Check
