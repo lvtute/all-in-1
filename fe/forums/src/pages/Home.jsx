@@ -214,20 +214,20 @@ const Home = () => {
         <Modal.Body>
           <Container>
             <Row>
-              <p
+              <div
                 dangerouslySetInnerHTML={createMarkup(questionDetail.content)}
-              ></p>
+              ></div>
             </Row>
             <hr></hr>
             <Row>
               {!!questionDetail.answer ? (
-                <p
+                <div
                   style={{
                     width: "100%",
                     textAlign: "right",
                   }}
                   dangerouslySetInnerHTML={createMarkup(questionDetail.answer)}
-                ></p>
+                ></div>
               ) : (
                 <p
                   style={{
