@@ -13,6 +13,7 @@ public class QuestionCreationRequest {
     @Size(min = 3, max = 200, message = "Câu hỏi có độ dài từ 3-200 ký tự")
     private String title;
 
+    @Size(min = 1, max = 500, message = "Nội dung quá dài")
     @NotBlank(message = "Vui lòng điền nội dung câu hỏi")
     private String content;
 
