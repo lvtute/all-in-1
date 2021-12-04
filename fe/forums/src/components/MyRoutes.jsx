@@ -1,4 +1,4 @@
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import AdminDashBoard from "../pages/AdminDashBoard";
 import Home from "../pages/Home";
@@ -15,6 +15,13 @@ const MyRoutes = () => {
   return (
     <>
       <Switch>
+        <Route
+          exact
+          path="/"
+          render={() => {
+            return <Redirect to="/home" />;
+          }}
+        />
         <Route path={LOGIN_PATH}>
           <Login />
         </Route>

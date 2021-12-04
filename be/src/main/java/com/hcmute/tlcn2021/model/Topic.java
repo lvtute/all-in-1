@@ -23,4 +23,8 @@ public class Topic extends BaseEntity {
     @ManyToMany(mappedBy = "topics")
     Set<User> users;
 
+    @JsonIgnore
+    @OneToMany(mappedBy="topic")
+    private Set<Question> questions;
+
 }

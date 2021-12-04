@@ -34,6 +34,12 @@ public class Question extends BaseEntity{
     @Column(columnDefinition = "integer default 0")
     private int views;
 
+    @Column(columnDefinition = "TEXT")
+    private String answer;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean approvedByDean;
+
     private Boolean agreeToReceiveEmailNotification;
 
 }

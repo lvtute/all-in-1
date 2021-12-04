@@ -30,7 +30,7 @@ td {
 
 .question-subtitle {
   color: #6c757d;
-  font-size: 70% !important;
+  font-size: 0.9em !important;
   margin-top: auto !important;
   font-style: italic;
 }
@@ -76,4 +76,9 @@ td {
 
 .validation-message {
   color: red;
+}
+
+.modal-dialog {
+  /* width: 100%; */
+  max-width: 60% !important;
 }

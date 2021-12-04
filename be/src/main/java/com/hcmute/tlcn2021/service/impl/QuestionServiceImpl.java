@@ -84,12 +84,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     private void increaseQuestionViews(Question question) {
         question.setViews(question.getViews() + 1);
-        Question saved = questionRepository.save(question);
-        if (saved.getId() != null) {
-            log.info("Question views increased successfully!");
-        } else {
-            log.info("Question views increased failed!");
-        }
+        questionRepository.save(question);
+
     }
 
     private QuestionPaginationResponse convert(Page<Question> questionPage) {

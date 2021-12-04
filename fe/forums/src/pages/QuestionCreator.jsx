@@ -8,11 +8,12 @@ import { useEffect, useState } from "react";
 import { EditorState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { convertToHTML } from "draft-convert";
 import ValidationMessage from "../components/ValidationMessage";
 import { toast } from "react-toastify";
 import { TOASTIFY_CONFIGS } from "../services/constants";
 import { useHistory } from "react-router-dom";
+
+import { stateToHTML } from "draft-js-export-html";
 // import { HOME_PATH } from "../services/constants";
 
 const QuestionCreator = () => {
@@ -63,7 +64,7 @@ const QuestionCreator = () => {
     const formData = Object.fromEntries(new FormData(event.target).entries());
     let requestBody = {
       ...formData,
-      content: convertToHTML(editorState.getCurrentContent()),
+      content: stateToHTML(editorState.getCurrentContent()),
       agreeToReceiveEmailNotification:
         !!formData.agreeToReceiveEmailNotification ? "true" : "false",
       facultyId: isNaN(formData.facultyId) ? "" : formData.facultyId,

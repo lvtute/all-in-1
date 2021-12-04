@@ -1,10 +1,11 @@
-import { ListGroup } from "react-bootstrap";
+import { Button, ListGroup, Modal } from "react-bootstrap";
 import { useEffect } from "react";
 import facultyService from "../services/faculty.service";
 import { useState } from "react";
 import { Container, Row, Col, Spinner, Card } from "react-bootstrap";
 import questionService from "../services/question.service";
 import Pagination from "@material-ui/lab/Pagination";
+import DOMPurify from "dompurify";
 
 const Home = () => {
   const [facultyList, setFacultyList] = useState([]);
@@ -18,6 +19,28 @@ const Home = () => {
   const [size, setSize] = useState(5);
   const [facultyId, setFacultyId] = useState(0);
   const sizes = [5, 10];
+
+  // modal's
+  const [show, setShow] = useState(false);
+  const [questionDetail, setQuestionDetail] = useState(Object);
+
+  const handleClose = () => {
+    setShow(false);
+    setQuestionDetail(Object);
+  };
+  const handleShow = () => setShow(true);
+
+  const handleOnQuestionClick = (id) => {
+    handleShow();
+    questionService.getById(id).then((res) => {
+      setQuestionDetail(res.data);
+      console.log(res.data);
+    });
+  };
+
+  const createMarkup = (richText) => {
+    return { __html: DOMPurify.sanitize(richText) };
+  };
 
   useEffect(() => {
     facultyService
@@ -106,7 +129,11 @@ const Home = () => {
           )}
 
           {questionList.map((question) => (
-            <Card key={question.id} style={{ padding: "1% 2%" }}>
+            <Card
+              onClick={() => handleOnQuestionClick(question.id)}
+              key={question.id}
+              style={{ padding: "1% 2%" }}
+            >
               <Card.Body style={{ padding: "0.1%" }}>
                 <Card.Title>{question.title}</Card.Title>
 
@@ -120,6 +147,19 @@ const Home = () => {
                 <Card.Subtitle className="question-subtitle">
                   đăng bởi: <span>{question.name}</span>- vào lúc{" "}
                   <span>{question.createdDate}</span>
+                </Card.Subtitle>
+
+                <Card.Subtitle
+                  className="question-subtitle"
+                  style={{ float: "right", display: "inline-block" }}
+                >
+                  {!!question.answer ? (
+                    <p style={{ color: "green", fontWeight: "bold" }}>
+                      Đã trả lời
+                    </p>
+                  ) : (
+                    <p style={{ color: "orange" }}>Chờ trả lời</p>
+                  )}
                 </Card.Subtitle>
 
                 <Card.Subtitle className="question-subtitle">
@@ -149,6 +189,98 @@ const Home = () => {
           </Row>
         </Col>
       </Row>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header>
+          <Container>
+            <Row>
+              <p
+                style={{
+                  textAlign: "right",
+                  width: "100%",
+                  color: "#6c757d",
+                  fontStyle: "italic",
+                }}
+              >{`bởi: ${questionDetail.name} | vào lúc: ${questionDetail.createdDate}`}</p>
+              <h2 style={{ color: "#005cb2", width: "100%" }}>
+                {questionDetail.title}
+              </h2>
+              <p
+                style={{ marginBottom: "0", color: "#6c757d" }}
+              >{`Khoa ${questionDetail.facultyName} | ${questionDetail.topicName}`}</p>
+            </Row>
+          </Container>
+        </Modal.Header>
+        <Modal.Body>
+          <Container>
+            <Row>
+              <p
+                dangerouslySetInnerHTML={createMarkup(questionDetail.content)}
+              ></p>
+            </Row>
+            <hr></hr>
+            <Row>
+              {!!questionDetail.answer ? (
+                <p
+                  style={{
+                    width: "100%",
+                    textAlign: "right",
+                  }}
+                  dangerouslySetInnerHTML={createMarkup(questionDetail.answer)}
+                ></p>
+              ) : (
+                <p
+                  style={{
+                    width: "100%",
+                    textAlign: "right",
+                    color: "#f57c00",
+                  }}
+                >
+                  <i className="bi bi-check-circle"></i>
+                  Đang chờ tư vấn viên trả lời...
+                </p>
+              )}
+              {questionDetail.userFullName && (
+                <p
+                  style={{
+                    textAlign: "right",
+                    width: "100%",
+                    color: "#6c757d",
+                    fontStyle: "italic",
+                  }}
+                >{`Tư vấn viên: ${questionDetail.userFullName}`}</p>
+              )}
+              {questionDetail.userFullName && questionDetail.updatedDate && (
+                <p
+                  style={{
+                    textAlign: "right",
+                    width: "100%",
+                    color: "#6c757d",
+                    fontStyle: "italic",
+                  }}
+                >{`Tư vấn viên: ${questionDetail.updatedDate}`}</p>
+              )}
+              {questionDetail.approvedByDean && (
+                <p
+                  style={{
+                    textAlign: "right",
+                    width: "100%",
+                    color: "#00b0ff",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Câu trả lời này đã được xác nhận bởi trưởng khoa
+                </p>
+              )}
+            </Row>
+          </Container>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
