@@ -26,4 +26,14 @@ public class QuestionResponse {
     private String topicName;
 
     private String createdDate;
+
+    private String updatedDate;
+
+    private int views;
+
+    private String answer;
+
+    private String userFullName;
+
+    private boolean approvedByDean;
 }

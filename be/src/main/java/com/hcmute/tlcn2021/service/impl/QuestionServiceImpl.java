@@ -11,6 +11,7 @@ import com.hcmute.tlcn2021.repository.TopicRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
 import com.hcmute.tlcn2021.service.QuestionService;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,10 +42,12 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private UserRepository userRepository;
 
-
     @Override
-    public QuestionPaginationResponse findAll(Pageable pageable) {
-        return convert(questionRepository.findAllByIsDeletedFalse(pageable));
+    public QuestionPaginationResponse findAll(Long facultyId, Pageable pageable) {
+        if (ObjectUtils.isEmpty(facultyId) || facultyId == 0) {
+            return convert(questionRepository.findAllByIsDeletedFalse(pageable));
+        }
+        return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEquals(facultyId, pageable));
     }
 
     @Transactional
@@ -70,6 +73,19 @@ public class QuestionServiceImpl implements QuestionService {
         Question savedQuestion = questionRepository.save(toBeSavedQuestion);
         log.info("Question saved successfully!");
         return savedQuestion.getId();
+    }
+
+    @Override
+    public QuestionResponse findById(Long id) {
+        Question foundQuestion = questionRepository.findById(id).orElseThrow(() -> new UteForumException("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND));
+        increaseQuestionViews(foundQuestion);
+        return convert(foundQuestion);
+    }
+
+    private void increaseQuestionViews(Question question) {
+        question.setViews(question.getViews() + 1);
+        questionRepository.save(question);
+
     }
 
     private QuestionPaginationResponse convert(Page<Question> questionPage) {

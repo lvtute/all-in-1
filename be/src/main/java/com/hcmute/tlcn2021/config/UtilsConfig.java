@@ -14,12 +14,14 @@ import java.time.format.DateTimeFormatter;
 public class UtilsConfig {
 
     @Bean
-    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+//    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ModelMapper modelMapper() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.createTypeMap(LocalDateTime.class, String.class).setConverter(context -> context.getSource().format(formatter));
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+
         return modelMapper;
     }
 }
