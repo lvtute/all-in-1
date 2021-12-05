@@ -12,4 +12,5 @@ public interface TopicService {
     TopicResponse findById(Long id);
     TopicResponse update(TopicUpdateRequest topicUpdateRequest);
     void deleteById(Long id);
+    List<Topic> findByFacultyId(Long id);
 }

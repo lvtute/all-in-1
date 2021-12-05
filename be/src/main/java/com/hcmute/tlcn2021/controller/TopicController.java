@@ -1,11 +1,7 @@
 package com.hcmute.tlcn2021.controller;
 
-
-import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Topic;
-import com.hcmute.tlcn2021.payload.request.FacultyUpdateRequest;
 import com.hcmute.tlcn2021.payload.request.TopicUpdateRequest;
-import com.hcmute.tlcn2021.payload.response.FacultyResponse;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.payload.response.TopicResponse;
 import com.hcmute.tlcn2021.service.TopicService;
@@ -15,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -48,6 +43,8 @@ public class TopicController {
                 + "' was successfully deleted"));
     }
 
-
-
+    @GetMapping("/find-by-faculty-id/{id}")
+    public ResponseEntity<List<Topic>> findByFacultyId(@PathVariable Long id) {
+        return ResponseEntity.ok(topicService.findByFacultyId(id));
+    }
 }

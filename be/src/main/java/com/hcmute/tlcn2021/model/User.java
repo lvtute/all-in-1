@@ -14,7 +14,7 @@ import java.util.Set;
         @UniqueConstraint(name = "unique_username_constraint",columnNames = "username"),
         @UniqueConstraint(name = "unique_email_constraint", columnNames = "email")
 })
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,9 +27,6 @@ public class User {
 
     private String password;
 
-    @Column(columnDefinition = "boolean default false")
-    private boolean isDeleted;
-
     @ManyToOne
     @JoinColumn(name="faculty_id")
     private Faculty faculty;
@@ -38,13 +35,12 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<Answer> answer;
-
-//    @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private Set<Question> question;
+    @ManyToMany
+    @JoinTable(
+            name = "user_topic",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "topic_id"))
+    Set<Topic> topics;
 
     public User() {
     }

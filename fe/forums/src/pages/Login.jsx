@@ -32,7 +32,7 @@ const Login = () => {
   };
 
   if (isLoggedIn) {
-    return <Redirect to={ HOME_PATH } />;
+    return <Redirect to={HOME_PATH} />;
   }
 
   return (

@@ -1,6 +1,5 @@
 package com.hcmute.tlcn2021.model;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +8,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table
 public class Question extends BaseEntity{
 
     private String title;
@@ -32,5 +30,16 @@ public class Question extends BaseEntity{
     @ManyToOne
     @JoinColumn(name="advisor_id")
     private User user;
+
+    @Column(columnDefinition = "integer default 0")
+    private int views;
+
+    @Column(columnDefinition = "TEXT")
+    private String answer;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean approvedByDean;
+
+    private Boolean agreeToReceiveEmailNotification;
 
 }

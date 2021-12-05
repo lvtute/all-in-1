@@ -1,6 +1,5 @@
 package com.hcmute.tlcn2021.service.impl;
 
-import com.hcmute.tlcn2021.exception.FacultyDeleteFailedException;
 import com.hcmute.tlcn2021.exception.TopicDeleteFailedException;
 import com.hcmute.tlcn2021.exception.TopicNotFoundException;
 import com.hcmute.tlcn2021.model.Topic;
@@ -33,6 +32,7 @@ public class TopicServiceImpl implements TopicService {
         return modelMapper
                 .map(topic, TopicResponse.class);
     }
+
     @Override
     public TopicResponse findById(Long id) {
 
@@ -62,5 +62,10 @@ public class TopicServiceImpl implements TopicService {
         int affectedRows = topicRepository.softDeleteTopic(id);
         if (affectedRows == 0)
             throw new TopicDeleteFailedException("There is error(s) trying to delete topic with id = " + id);
+    }
+
+    @Override
+    public List<Topic> findByFacultyId(Long id) {
+        return topicRepository.findAllByFaculty_Id(id);
     }
 }
