@@ -15,6 +15,7 @@ export const HOME_PATH = "/home";
 export const ADMIN_PATH = "/admin";
 export const LOGIN_PATH = "/login";
 export const QUESTION_CREATOR_PATH = "/create-question";
+export const ADVISER_PATH="/adviser";
 
 export const USER_SUB_PATH = "/user";
 // ADMIN PATHS

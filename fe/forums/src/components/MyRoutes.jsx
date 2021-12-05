@@ -6,11 +6,12 @@ import Login from "../pages/Login";
 import QuestionCreator from "../pages/QuestionCreator";
 import {
   ADMIN_PATH,
+  ADVISER_PATH,
   HOME_PATH,
   LOGIN_PATH,
   QUESTION_CREATOR_PATH,
 } from "../services/constants";
-
+import AdviserDashboard from "../pages/AdviserDashboard";
 const MyRoutes = () => {
   return (
     <>
@@ -33,6 +34,9 @@ const MyRoutes = () => {
         </Route>
         <Route path={QUESTION_CREATOR_PATH}>
           <QuestionCreator />
+        </Route>
+        <Route path={ADVISER_PATH}>
+          <AdviserDashboard />
         </Route>
       </Switch>
       <ToastContainer />
