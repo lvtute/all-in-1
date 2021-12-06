@@ -2,8 +2,12 @@ package com.hcmute.tlcn2021.service.impl;
 
 import com.hcmute.tlcn2021.exception.*;
 import com.hcmute.tlcn2021.model.Faculty;
+import com.hcmute.tlcn2021.model.User;
+import com.hcmute.tlcn2021.payload.request.CreateFacultyRequest;
 import com.hcmute.tlcn2021.payload.request.FacultyUpdateRequest;
+import com.hcmute.tlcn2021.payload.request.SignupRequest;
 import com.hcmute.tlcn2021.payload.response.FacultyResponse;
+import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.service.FacultyService;
 import org.modelmapper.ModelMapper;
@@ -38,6 +42,29 @@ public class FacultyServiceImpl implements FacultyService {
         Faculty foundUser = facultyRepository.findById(id).orElseThrow(() ->
                 new FacultyNotFoundException("User with id = " + id + " can not be found!"));
         return convertSingleFaculty(foundUser);
+    }
+
+    // them moi
+    @Override
+    public MessageResponse createFaculty(CreateFacultyRequest createFacultyRequest) {
+        Faculty faculty = new Faculty(createFacultyRequest.getName());
+
+//        user.setRole(roleRepository.findById(createFacultyRequest.getRoleId())
+//                .orElseThrow(() -> new CustomedRoleNotFoundException("Role with id = " + createFacultyRequest.getRoleId() + "does not exist")));
+//
+//        if (createFacultyRequest.getFacultyId() != 0) {
+//            user.setFaculty(facultyRepository.findById(createFacultyRequest.getFacultyId())
+//                    .orElseThrow(() -> new FacultyNotFoundException(
+//                            "Faculty with id = '" + createFacultyRequest.getFacultyId() +
+//                                    "' does not exist"
+//                    )));
+//        } else {
+//            user.setFaculty(null);
+//        }
+        faculty.setName(createFacultyRequest.getName());
+        Faculty savedFaculty = facultyRepository.save(faculty);
+        return new MessageResponse(String.format("Faculty %s create successfully!",
+                savedFaculty.getName()));
     }
     // cap nhat
 

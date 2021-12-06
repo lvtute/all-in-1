@@ -1,7 +1,9 @@
 package com.hcmute.tlcn2021.controller;
 
 import com.hcmute.tlcn2021.model.Faculty;
+import com.hcmute.tlcn2021.payload.request.CreateFacultyRequest;
 import com.hcmute.tlcn2021.payload.request.FacultyUpdateRequest;
+import com.hcmute.tlcn2021.payload.request.SignupRequest;
 import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
 import com.hcmute.tlcn2021.payload.response.FacultyResponse;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -30,6 +33,14 @@ public class FacultyController {
     public ResponseEntity<FacultyResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(facultyService.findById(id));
     }
+
+    // them
+    @PostMapping("/insert")
+    public ResponseEntity<MessageResponse> createFaculty(@RequestBody @Valid CreateFacultyRequest createFacultyRequest) {
+
+        return ResponseEntity.ok(facultyService.createFaculty(createFacultyRequest));
+    }
+    // cap nhat
 
     @PutMapping
     public ResponseEntity<MessageResponse> update(@RequestBody FacultyUpdateRequest facultyUpdateRequest) {

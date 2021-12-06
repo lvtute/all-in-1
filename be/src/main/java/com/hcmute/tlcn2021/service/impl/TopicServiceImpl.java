@@ -2,8 +2,12 @@ package com.hcmute.tlcn2021.service.impl;
 
 import com.hcmute.tlcn2021.exception.TopicDeleteFailedException;
 import com.hcmute.tlcn2021.exception.TopicNotFoundException;
+import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Topic;
+import com.hcmute.tlcn2021.payload.request.CreateFacultyRequest;
+import com.hcmute.tlcn2021.payload.request.CreateTopicRequest;
 import com.hcmute.tlcn2021.payload.request.TopicUpdateRequest;
+import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.payload.response.TopicResponse;
 import com.hcmute.tlcn2021.repository.TopicRepository;
 import com.hcmute.tlcn2021.service.TopicService;
@@ -40,6 +44,19 @@ public class TopicServiceImpl implements TopicService {
                 new TopicNotFoundException("Topic with id = " + id + " can not be found!"));
         return convertSingleTopic(foundUser);
     }
+
+    // them moi
+    @Override
+    public MessageResponse createTopic(CreateTopicRequest createTopicRequest) {
+        Topic faculty = new Topic(createTopicRequest.getName());
+
+        faculty.setName(createTopicRequest.getName());
+
+        Topic savedTopic = topicRepository.save(faculty);
+        return new MessageResponse(String.format("Topic %s create successfully!",
+                savedTopic.getName()));
+    }
+
     // cap nhat
 
 

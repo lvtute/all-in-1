@@ -23,4 +23,11 @@ public class Faculty {
     private Set<User> users;
     @Column(columnDefinition = "boolean default false")
     private boolean isDeleted;
+
+    public Faculty() {
+    }
+
+    public Faculty(String name) {
+        this.name = name;
+    }
 }

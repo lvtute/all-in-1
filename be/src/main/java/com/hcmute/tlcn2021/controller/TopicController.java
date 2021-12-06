@@ -1,6 +1,8 @@
 package com.hcmute.tlcn2021.controller;
 
 import com.hcmute.tlcn2021.model.Topic;
+import com.hcmute.tlcn2021.payload.request.CreateFacultyRequest;
+import com.hcmute.tlcn2021.payload.request.CreateTopicRequest;
 import com.hcmute.tlcn2021.payload.request.TopicUpdateRequest;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.payload.response.TopicResponse;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -29,6 +32,14 @@ public class TopicController {
     public ResponseEntity<TopicResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(topicService.findById(id));
     }
+    // them
+    @PostMapping("/insert")
+    public ResponseEntity<MessageResponse> createTopic(@RequestBody @Valid CreateTopicRequest createTopicRequest) {
+
+        return ResponseEntity.ok(topicService.createTopic(createTopicRequest));
+    }
+
+    // cap nhat
 
     @PutMapping
     public ResponseEntity<MessageResponse> update(@RequestBody TopicUpdateRequest topicUpdateRequest) {

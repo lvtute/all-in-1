@@ -30,5 +30,10 @@ public class Topic extends BaseEntity {
     @JsonIgnore
     @OneToMany(mappedBy="topic")
     private Set<Question> questions;
+    public Topic() {
+    }
+    public Topic(String name) {
+        this.name = name;
+    }
 
 }
