@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-public class Question extends BaseEntity{
+public class Question extends BaseEntity {
 
     private String title;
 
@@ -20,16 +20,16 @@ public class Question extends BaseEntity{
     private String email;
 
     @ManyToOne
-    @JoinColumn(name="faculty_id")
+    @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
     @ManyToOne
-    @JoinColumn(name="topic_id")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 
     @ManyToOne
-    @JoinColumn(name="advisor_id")
-    private User user;
+    @JoinColumn(name = "adviser_id")
+    private User adviser;
 
     @Column(columnDefinition = "integer default 0")
     private int views;

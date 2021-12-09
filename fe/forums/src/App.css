@@ -77,8 +77,3 @@ td {
 .validation-message {
   color: red;
 }
-
-.modal-dialog {
-  /* width: 100%; */
-  max-width: 60% !important;
-}

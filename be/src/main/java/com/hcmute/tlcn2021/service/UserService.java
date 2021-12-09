@@ -1,5 +1,6 @@
 package com.hcmute.tlcn2021.service;
 
+import com.hcmute.tlcn2021.payload.request.ChangePasswordRequest;
 import com.hcmute.tlcn2021.payload.request.LoginRequest;
 import com.hcmute.tlcn2021.payload.request.SignupRequest;
 import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
@@ -22,4 +23,6 @@ public interface UserService {
     void deleteById(Long id);
 
     UsersPaginationResponse getPage(Pageable pageable);
+
+    void changePassword(ChangePasswordRequest changePasswordRequest);
 }

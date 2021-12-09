@@ -10,7 +10,7 @@ import store from "./store";
 ReactDOM.render(
   // <React.StrictMode> // https://stackoverflow.com/questions/67415620/fixing-index-js1-warning-using-unsafe-componentwillreceiveprops-in-strict-mod
   <Provider store={store}>
-    <App />
+      <App />
   </Provider>,
   // </React.StrictMode>,
   document.getElementById("root")

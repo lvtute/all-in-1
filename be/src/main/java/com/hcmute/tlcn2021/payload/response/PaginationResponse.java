@@ -9,8 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class QuestionPaginationResponse {
-    List<QuestionResponse> content;
+public class PaginationResponse {
+    List<Object> content;
     int number;
     int size;
     int totalElements;

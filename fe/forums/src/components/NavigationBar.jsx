@@ -5,15 +5,36 @@ import {
   HOME_PATH,
   QUESTION_CREATOR_PATH,
   LOGIN_PATH,
+  ROLE_ADVISER,
+  ROLE_ADMIN,
+  ADVISER_PATH,
+  ADMIN_PATH,
 } from "../services/constants";
+import { useState, useEffect } from "react";
+import { useHistory } from "react-router";
 
 const NavigationBar = () => {
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const history = useHistory();
+
+  const [showAdviserDashboardButton, setShowAdviserDashboardButton] =
+    useState(false);
+  const [showAdminDashboardButton, setShowAdminDashboardButton] =
+    useState(true);
 
   const handleLogout = () => {
     dispatch(logout());
+    history.push(LOGIN_PATH);
   };
+
+  useEffect(() => {
+    if (user) {
+      setShowAdviserDashboardButton(user.role === ROLE_ADVISER);
+      setShowAdminDashboardButton(user.role === ROLE_ADMIN);
+    }
+  }, [user]);
+
   return (
     <Navbar
       bg="primary"
@@ -28,7 +49,26 @@ const NavigationBar = () => {
       {isLoggedIn ? (
         <Nav>
           <NavDropdown title={`${user.username}`} id="basic-nav-dropdown">
-            <NavDropdown.Item onClick={handleLogout}>Log out</NavDropdown.Item>
+            {showAdviserDashboardButton && (
+              <>
+                <NavDropdown.Item href={ADVISER_PATH}>
+                  Trang TƯ VẤN VIÊN
+                </NavDropdown.Item>
+
+                <NavDropdown.Divider />
+              </>
+            )}
+            {showAdminDashboardButton && (
+              <>
+                <NavDropdown.Item href={ADMIN_PATH}>
+                  Trang QUẢN TRỊ VIÊN
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+              </>
+            )}
+            <NavDropdown.Item onClick={handleLogout}>
+              Đăng xuất
+            </NavDropdown.Item>
           </NavDropdown>
         </Nav>
       ) : (

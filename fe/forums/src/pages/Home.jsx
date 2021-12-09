@@ -5,8 +5,7 @@ import { useState } from "react";
 import { Container, Row, Col, Spinner, Card } from "react-bootstrap";
 import questionService from "../services/question.service";
 import Pagination from "@material-ui/lab/Pagination";
-import DOMPurify from "dompurify";
-
+import createMarkup from "../common/createMarkup";
 const Home = () => {
   const [facultyList, setFacultyList] = useState([]);
   const [isFacultyLoading, setFacultyLoadingStatus] = useState(true);
@@ -38,9 +37,9 @@ const Home = () => {
     });
   };
 
-  const createMarkup = (richText) => {
-    return { __html: DOMPurify.sanitize(richText) };
-  };
+  // const createMarkup = (richText) => {
+  //   return { __html: DOMPurify.sanitize(richText) };
+  // };
 
   useEffect(() => {
     facultyService
@@ -190,7 +189,11 @@ const Home = () => {
         </Col>
       </Row>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="lg"
+      >
         <Modal.Header>
           <Container>
             <Row>
@@ -240,26 +243,18 @@ const Home = () => {
                   Đang chờ tư vấn viên trả lời...
                 </p>
               )}
-              {questionDetail.userFullName && (
-                <p
-                  style={{
-                    textAlign: "right",
-                    width: "100%",
-                    color: "#6c757d",
-                    fontStyle: "italic",
-                  }}
-                >{`Tư vấn viên: ${questionDetail.userFullName}`}</p>
-              )}
-              {questionDetail.userFullName && questionDetail.updatedDate && (
-                <p
-                  style={{
-                    textAlign: "right",
-                    width: "100%",
-                    color: "#6c757d",
-                    fontStyle: "italic",
-                  }}
-                >{`Tư vấn viên: ${questionDetail.updatedDate}`}</p>
-              )}
+              {questionDetail.adviserFullName &&
+                questionDetail.lastModifiedDate &&
+                questionDetail.answer && (
+                  <p
+                    style={{
+                      textAlign: "right",
+                      width: "100%",
+                      color: "#6c757d",
+                      fontStyle: "italic",
+                    }}
+                  >{`Tư vấn viên: ${questionDetail.adviserFullName}- ${questionDetail.lastModifiedDate}`}</p>
+                )}
               {questionDetail.approvedByDean && (
                 <p
                   style={{

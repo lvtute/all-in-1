@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = " SELECT id " +
             " FROM (SELECT u.id, count(q.id) as my_count " +
-            " FROM user u LEFT JOIN question q ON u.id = q.advisor_id JOIN user_topic ut ON u.id = ut.user_id " +
+            " FROM user u LEFT JOIN question q ON u.id = q.adviser_id JOIN user_topic ut ON u.id = ut.user_id " +
             " WHERE ut.topic_id = :topicId " +
             " AND u.is_deleted = false " +
             " GROUP BY u.id) AS T ORDER BY my_count ASC LIMIT 1 ", nativeQuery = true)
@@ -31,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = " SELECT id " +
             " FROM (SELECT u.id, count(q.id) as my_count " +
-            " FROM user u LEFT JOIN question q ON u.id = q.advisor_id JOIN role r ON u.role_id = r.id " +
+            " FROM user u LEFT JOIN question q ON u.id = q.adviser_id JOIN role r ON u.role_id = r.id " +
             " WHERE u.is_deleted = false " +
             " AND u.faculty_id = :facultyId " +
             " AND r.name = 'ROLE_ADVISER' " +

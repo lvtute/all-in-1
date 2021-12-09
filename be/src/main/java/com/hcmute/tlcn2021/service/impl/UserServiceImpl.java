@@ -1,14 +1,11 @@
 package com.hcmute.tlcn2021.service.impl;
 
 import com.hcmute.tlcn2021.config.jwt.JwtUtils;
+import com.hcmute.tlcn2021.config.service.AuthenticationFacade;
 import com.hcmute.tlcn2021.config.service.UserDetailsImpl;
-import com.hcmute.tlcn2021.enumeration.ERole;
-import com.hcmute.tlcn2021.exception.CustomedRoleNotFoundException;
-import com.hcmute.tlcn2021.exception.FacultyNotFoundException;
-import com.hcmute.tlcn2021.exception.UserDeleteFailedException;
-import com.hcmute.tlcn2021.exception.UserNotFoundException;
-import com.hcmute.tlcn2021.model.Role;
+import com.hcmute.tlcn2021.exception.*;
 import com.hcmute.tlcn2021.model.User;
+import com.hcmute.tlcn2021.payload.request.ChangePasswordRequest;
 import com.hcmute.tlcn2021.payload.request.LoginRequest;
 import com.hcmute.tlcn2021.payload.request.SignupRequest;
 import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
@@ -17,11 +14,13 @@ import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.repository.RoleRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
 import com.hcmute.tlcn2021.service.UserService;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,11 +29,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -58,10 +57,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FacultyRepository facultyRepository;
 
-//    @PostConstruct
-//    private void postConstruct() {
-//        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
-//    }
+    @Autowired
+    private AuthenticationFacade authenticationFacade;
 
     @Override
     public JwtResponse signIn(LoginRequest loginRequest) {
@@ -137,7 +134,7 @@ public class UserServiceImpl implements UserService {
         }
         foundUser.setFullName(userUpdateRequest.getFullName());
 
-        userRepository.save(foundUser);
+//        userRepository.save(foundUser);
         return convertSingleUser(userRepository.save(foundUser));
     }
 
@@ -160,6 +157,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public UsersPaginationResponse getPage(Pageable pageable) {
         return convert(userRepository.findAllByIsDeletedFalse(pageable));
+    }
+
+    @Secured({"ROLE_DEAN", "ROLE_ADMIN", "ROLE_ADVISER"})
+    @Override
+    public void changePassword(ChangePasswordRequest changePasswordRequest) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authenticationFacade.getAuthentication().getPrincipal();
+
+        if (!encoder.matches(changePasswordRequest.getOldPassword(), userDetails.getPassword())) {
+            throw new UteForumException("Mật khẩu hiện tại không đúng", HttpStatus.BAD_REQUEST);
+        }
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new UteForumException("Không tìm thấy người dùng", HttpStatus.INTERNAL_SERVER_ERROR));
+        user.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
+        log.info("Password updated successfully");
+
     }
 
     private SingleUserDetailsResponse convertSingleUser(User user) {

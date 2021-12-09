@@ -1,6 +1,5 @@
 package com.hcmute.tlcn2021.payload.response;
 
-import com.hcmute.tlcn2021.model.Role;
 import lombok.Getter;
 import lombok.Setter;
 
