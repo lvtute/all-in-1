@@ -17,5 +17,7 @@ export const LOGIN_PATH = "/login";
 export const QUESTION_CREATOR_PATH = "/create-question";
 
 export const USER_SUB_PATH = "/user";
+export const FACULTY_SUB_PATH = "/faculty";
 // ADMIN PATHS
-export const USER_MANAGEMENT_PATH = ADMIN_PATH + USER_SUB_PATH;
+export const USER_MANAGEMENT_PATH = ADMIN_PATH + USER_SUB_PATH ;
+export const FACULTY_MANAGEMENT_PATH = ADMIN_PATH + FACULTY_SUB_PATH ;
