@@ -4,15 +4,29 @@ import AdminDashBoard from "../pages/AdminDashBoard";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import QuestionCreator from "../pages/QuestionCreator";
+import QuestionReplier from "../pages/QuestionReplier";
+import Page404 from "../pages/Page404";
+import Page401 from "../pages/Page401";
+import Page403 from "../pages/Page403";
 import {
   ADMIN_PATH,
   ADVISER_PATH,
   HOME_PATH,
   LOGIN_PATH,
   QUESTION_CREATOR_PATH,
+  QUESTION_REPLIER,
+  ROLE_ADVISER,
 } from "../services/constants";
 import AdviserDashboard from "../pages/AdviserDashboard";
+import { useSelector } from "react-redux";
+
 const MyRoutes = () => {
+  const { user } = useSelector((state) => state.auth);
+  let role = "";
+  if (!!user) {
+    role = user.role;
+  }
+
   return (
     <>
       <Switch>
@@ -37,6 +51,21 @@ const MyRoutes = () => {
         </Route>
         <Route path={ADVISER_PATH}>
           <AdviserDashboard />
+        </Route>
+        <Route
+          path={`${QUESTION_REPLIER}/:id`}
+          children={
+            role === ROLE_ADVISER ? <QuestionReplier /> : <Redirect to="/403" />
+          }
+        />
+        <Route path="/401">
+          <Page401 />
+        </Route>
+        <Route path="/403">
+          <Page403 />
+        </Route>
+        <Route path="*">
+          <Page404 />
         </Route>
       </Switch>
       <ToastContainer />

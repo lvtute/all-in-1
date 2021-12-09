@@ -1,6 +1,5 @@
 import { Slide } from "react-toastify";
 
-
 export const TOASTIFY_CONFIGS = {
   position: "top-right",
   autoClose: 4000,
@@ -15,8 +14,12 @@ export const HOME_PATH = "/home";
 export const ADMIN_PATH = "/admin";
 export const LOGIN_PATH = "/login";
 export const QUESTION_CREATOR_PATH = "/create-question";
-export const ADVISER_PATH="/adviser";
+export const ADVISER_PATH = "/adviser";
 
 export const USER_SUB_PATH = "/user";
 // ADMIN PATHS
 export const USER_MANAGEMENT_PATH = ADMIN_PATH + USER_SUB_PATH;
+
+export const ROLE_ADVISER = "ROLE_ADVISER";
+export const ROLE_ADMIN = "ROLE_ADMIN";
+export const QUESTION_REPLIER = "/question-replier";

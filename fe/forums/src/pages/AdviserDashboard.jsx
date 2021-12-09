@@ -8,12 +8,14 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import PasswordChanger from "../components/PasswordChanger";
 
 const AdminDashBoard = () => {
   let match = useRouteMatch();
   // path enum
   const adviserPath = Object.freeze({
     question: `${match.url}/question`,
+    passwordChanger: `${match.url}/password-changer`,
   });
 
   return (
@@ -30,11 +32,11 @@ const AdminDashBoard = () => {
                   </ListGroup.Item>
                 </Link>
 
-                {/* <Link to={`${adminPath.faculty}`}>
+                <Link to={`${adviserPath.passwordChanger}`}>
                   <ListGroup.Item action variant="info">
-                    Quản lý phòng ban
+                    Đổi mật khẩu
                   </ListGroup.Item>
-                </Link> */}
+                </Link>
               </ListGroup>
             </Col>
 
@@ -43,9 +45,9 @@ const AdminDashBoard = () => {
                 <Route path={adviserPath.question}>
                   <QuestionManager />
                 </Route>
-                {/* <Route path={adminPath.faculty}>
-                  <FacultyManager />
-                </Route> */}
+                <Route path={adviserPath.passwordChanger}>
+                  <PasswordChanger />
+                </Route>
               </Switch>
             </Col>
           </Row>

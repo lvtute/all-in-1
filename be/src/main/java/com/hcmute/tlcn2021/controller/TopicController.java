@@ -16,8 +16,8 @@ public class TopicController {
     @Autowired
     private TopicService topicService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<Topic>> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(topicService.findById(id));
+    @GetMapping("/find-by-faculty-id/{id}")
+    public ResponseEntity<List<Topic>> findByFacultyId(@PathVariable Long id) {
+        return ResponseEntity.ok(topicService.findByFacultyId(id));
     }
 }

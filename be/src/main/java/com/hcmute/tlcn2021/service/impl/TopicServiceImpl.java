@@ -14,7 +14,7 @@ public class TopicServiceImpl implements TopicService {
     private TopicRepository topicRepository;
 
     @Override
-    public List<Topic> findById(Long id) {
+    public List<Topic> findByFacultyId(Long id) {
         return topicRepository.findAllByFaculty_Id(id);
     }
 }

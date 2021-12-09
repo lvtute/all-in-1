@@ -27,13 +27,13 @@ public class QuestionResponse {
 
     private String createdDate;
 
-    private String updatedDate;
+    private String lastModifiedDate;
 
     private int views;
 
     private String answer;
 
-    private String userFullName;
+    private String adviserFullName;
 
     private boolean approvedByDean;
 }

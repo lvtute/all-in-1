@@ -24,7 +24,7 @@ const Login = () => {
     dispatch(login(username, password))
       .then(() => {
         history.push({ HOME_PATH });
-        // window.location.reload();
+        // return <Redirect to={HOME_PATH}/>;
       })
       .catch(() => {
         setLoading(false);
