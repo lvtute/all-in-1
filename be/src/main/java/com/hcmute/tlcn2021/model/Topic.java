@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.*;
 import java.util.Set;
 
@@ -26,5 +30,10 @@ public class Topic extends BaseEntity {
     @JsonIgnore
     @OneToMany(mappedBy="topic")
     private Set<Question> questions;
+    public Topic() {
+    }
+    public Topic(String name) {
+        this.name = name;
+    }
 
 }

@@ -6,6 +6,10 @@ const register = (signUpRequestObject) => {
   return http.post(API_URL + "sign-up", signUpRequestObject);
 };
 
+const createFaculty = (createFacultyRequestObject) => {
+  return http.post(API_URL + "insert", createFacultyRequestObject);
+};
+
 const login = (username, password) => {
   return http
     .post(API_URL + "sign-in", {
@@ -30,6 +34,7 @@ const getCurrentUser = () => {
 
 const authenService = {
   register,
+  createFaculty,
   login,
   logout,
   getCurrentUser
