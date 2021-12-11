@@ -34,19 +34,11 @@ public class TopicController {
         return ResponseEntity.ok(topicService.findById(id));
     }
 
-//    @GetMapping("/find-by-faculty-id/{id}")
-//    public ResponseEntity<List<Topic>> findByFacultyId(@PathVariable Long id) {
-//        return ResponseEntity.ok(topicService.findByFacultyId(id));
-//    }
-
-    // them
     @PostMapping("/insert")
     public ResponseEntity<MessageResponse> createTopic(@RequestBody @Valid CreateTopicRequest createTopicRequest) {
 
         return ResponseEntity.ok(topicService.createTopic(createTopicRequest));
     }
-
-    // cap nhat
 
     @PutMapping
     public ResponseEntity<MessageResponse> update(@RequestBody TopicUpdateRequest topicUpdateRequest) {
@@ -54,7 +46,6 @@ public class TopicController {
                 .body(new MessageResponse(String.format("Topic %s updated successfully!", topicService.update(topicUpdateRequest).getName())));
     }
 
-    // xoa
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> delete(@PathVariable Long id) {
         topicService.deleteById(id);
