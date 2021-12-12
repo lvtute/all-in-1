@@ -37,7 +37,7 @@ INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `role_id`) 
 
 -- IT Users
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (2, 'tranvanc@gmail.com', @pw, 'mod1', N'Trần Văn Nam', 1, 2);
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (3, 'nguyenvana@gmail.com', @pw, 'mod2', 'Nguyen Van A', 2, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (3, 'nguyenvana@gmail.com', @pw, 'mod2', 'Nguyen Van A', 1, 1);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (4, 'jbutt@gmail.com', @pw, 'jamesbutt', N'James Butt', 1, 1);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (5, 'josephine_darakjy@darakjy.org', @pw, 'josephine_darakjy', 'Josephine Darakjy', 1, 1);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (6, 'art@venere.org', @pw, 'art', 'Art	Venere', 1, 1);

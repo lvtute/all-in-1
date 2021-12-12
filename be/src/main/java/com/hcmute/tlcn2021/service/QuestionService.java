@@ -18,4 +18,6 @@ public interface QuestionService {
     QuestionResponse saveAnswer(QuestionReplyRequest questionReplyRequest);
 
     void delete(Long questionId);
+
+    PaginationResponse findAllByDean(Boolean noAnswerOnly, Pageable pageable);
 }

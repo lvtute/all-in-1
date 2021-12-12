@@ -1,5 +1,6 @@
 package com.hcmute.tlcn2021.config;
 
+import org.apache.commons.text.RandomStringGenerator;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -22,5 +23,10 @@ public class UtilsConfig {
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         return modelMapper;
+    }
+
+    @Bean
+    public RandomStringGenerator passwordGenerator() {
+        return new RandomStringGenerator.Builder().withinRange(33, 45).build();
     }
 }

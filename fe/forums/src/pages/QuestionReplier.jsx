@@ -10,11 +10,24 @@ import { EditorState, ContentState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import { stateToHTML } from "draft-js-export-html";
 import { toast } from "react-toastify";
-import { ADVISER_PATH, TOASTIFY_CONFIGS } from "../services/constants";
+import {
+  ADVISER_PATH,
+  DEAN_PATH,
+  ROLE_ADVISER,
+  TOASTIFY_CONFIGS,
+} from "../services/constants";
 import history from "../history";
 import DraftPasteProcessor from "draft-js/lib/DraftPasteProcessor";
+import { useSelector } from "react-redux";
 
 const QuestionReplier = () => {
+  const { user } = useSelector((state) => state.auth);
+  let role = "";
+  if (!!user) {
+    role = user.role;
+  }
+  let dashboard = role === ROLE_ADVISER ? ADVISER_PATH : DEAN_PATH;
+
   let { id } = useParams();
 
   const [questionDetail, setQuestionDetail] = useState(Object);
@@ -68,7 +81,7 @@ const QuestionReplier = () => {
       .then((res) => {
         console.log(res);
         toast.success("Lưu câu trả lời thành công!", TOASTIFY_CONFIGS);
-        history.push(`${ADVISER_PATH}/question`);
+        history.push(`${dashboard}/question`);
         // setIsSubmitting(false);
       })
       .catch((err) => {
@@ -88,7 +101,8 @@ const QuestionReplier = () => {
       .deleteQuestion(id)
       .then((res) => {
         toast.success("Xóa thành công", TOASTIFY_CONFIGS);
-        history.push(`${ADVISER_PATH}/question`);
+
+        history.push(`${dashboard}/question`);
       })
       .catch((err) => {
         toast.error("Xóa thất bại", TOASTIFY_CONFIGS);
@@ -201,11 +215,13 @@ const QuestionReplier = () => {
             />
           </Form.Row>
 
-          <Form.Check
-            name="consultDean"
-            type="checkbox"
-            label="Gửi mail cho Trưởng khoa để xác nhận câu trả lời"
-          />
+          {role === ROLE_ADVISER && (
+            <Form.Check
+              name="consultDean"
+              type="checkbox"
+              label="Gửi mail cho Trưởng khoa để xác nhận câu trả lời"
+            />
+          )}
         </Form.Group>
         <Button disabled={isSubmitting} variant="primary" type="submit">
           Lưu

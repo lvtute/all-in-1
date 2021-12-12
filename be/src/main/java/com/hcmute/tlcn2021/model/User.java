@@ -1,10 +1,11 @@
 package com.hcmute.tlcn2021.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,12 +35,13 @@ public class User extends BaseEntity {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_topic",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id"))
-    Set<Topic> topics;
+    List<Topic> topics;
 
     public User() {
     }

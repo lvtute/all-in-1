@@ -3,20 +3,22 @@ package com.hcmute.tlcn2021.service.impl;
 import com.hcmute.tlcn2021.config.jwt.JwtUtils;
 import com.hcmute.tlcn2021.config.service.AuthenticationFacade;
 import com.hcmute.tlcn2021.config.service.UserDetailsImpl;
+import com.hcmute.tlcn2021.enumeration.ERole;
 import com.hcmute.tlcn2021.exception.*;
 import com.hcmute.tlcn2021.model.User;
-import com.hcmute.tlcn2021.payload.request.ChangePasswordRequest;
-import com.hcmute.tlcn2021.payload.request.LoginRequest;
-import com.hcmute.tlcn2021.payload.request.SignupRequest;
-import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
+import com.hcmute.tlcn2021.payload.request.*;
 import com.hcmute.tlcn2021.payload.response.*;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
 import com.hcmute.tlcn2021.repository.RoleRepository;
+import com.hcmute.tlcn2021.repository.TopicRepository;
 import com.hcmute.tlcn2021.repository.UserRepository;
+import com.hcmute.tlcn2021.service.EmailService;
 import com.hcmute.tlcn2021.service.UserService;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.text.RandomStringGenerator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -60,6 +62,21 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AuthenticationFacade authenticationFacade;
 
+    @Autowired
+    private TopicRepository topicRepository;
+
+    @Autowired
+    private RandomStringGenerator passwordGenerator;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${forum.app.password.length}")
+    private int passwordLength;
+
+    @Value("${fe.path.login}")
+    private String loginPath;
+
     @Override
     public JwtResponse signIn(LoginRequest loginRequest) {
 
@@ -83,14 +100,16 @@ public class UserServiceImpl implements UserService {
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                role);
+                role,
+                userDetails.getFaculty());
     }
 
     @Override
     public MessageResponse signUp(SignupRequest signUpRequest) {
+        String password = generatePassword();
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                encoder.encode(generatePassword()));
+                encoder.encode(password));
 
         user.setRole(roleRepository.findById(signUpRequest.getRoleId())
                 .orElseThrow(() -> new CustomedRoleNotFoundException("Role with id = " + signUpRequest.getRoleId() + "does not exist")));
@@ -108,6 +127,16 @@ public class UserServiceImpl implements UserService {
         user.setFullName(signUpRequest.getFullName());
 
         User savedUser = userRepository.save(user);
+
+        // send email
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append("Xin chào ").append(savedUser.getFullName()).append("\n");
+        messageBuilder.append("Tài khoản của bạn đã được tạo thành công!\n");
+        messageBuilder.append("Tài khoản: ").append(savedUser.getUsername()).append("\n");
+        messageBuilder.append("Mật khẩu: ").append(password).append("\n");
+        messageBuilder.append("Xin mời đăng nhập tại ").append(loginPath).append(" và đổi mật khẩu").append("\n");
+
+        emailService.sendSimpleMessage(savedUser.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Tạo tài khoản thành công", messageBuilder.toString());
 
         return new MessageResponse(String.format("User %s registered successfully!",
                 savedUser.getUsername()));
@@ -134,7 +163,6 @@ public class UserServiceImpl implements UserService {
         }
         foundUser.setFullName(userUpdateRequest.getFullName());
 
-//        userRepository.save(foundUser);
         return convertSingleUser(userRepository.save(foundUser));
     }
 
@@ -146,6 +174,7 @@ public class UserServiceImpl implements UserService {
         return convertSingleUser(foundUser);
     }
 
+    @Secured({"ROLE_ADMIN", "ROLE_DEAN"})
     @Override
     @Transactional
     public void deleteById(Long id) {
@@ -175,6 +204,84 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Secured({"ROLE_DEAN"})
+    @Override
+    public PaginationResponse findByDean(Pageable pageable) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authenticationFacade.getAuthentication().getPrincipal();
+
+        if (userDetails.getFaculty() == null) {
+            throw new UteForumException("Bạn không thuộc bất kỳ khoa nào", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Long roleDeanId = roleRepository.findByName(ERole.ROLE_ADVISER)
+                .orElseThrow(() -> new UteForumException("Không tìm thấy id của ROLE_ADVISER", HttpStatus.INTERNAL_SERVER_ERROR))
+                .getId();
+        Page<User> pageUserFromDb =
+                userRepository.findAllByIsDeletedFalseAndFaculty_IdEqualsAndRole_IdEquals(userDetails.getFaculty().getId(), roleDeanId, pageable);
+
+        PaginationResponse result = modelMapper.map(pageUserFromDb, PaginationResponse.class);
+        result.setContent(pageUserFromDb.getContent().stream()
+                .map(u -> modelMapper.map(u, SingleUserDetailsResponse.class))
+                .collect(Collectors.toList()));
+
+        return result;
+    }
+
+    @Secured({"ROLE_DEAN"})
+    @Transactional
+    @Override
+    public void updateByDean(UserUpdateByDeanRequest request) {
+        User toBeUpdatedUser = userRepository.findById(request.getId())
+                .orElseThrow(() -> new UteForumException("Không tìm thấy người dùng", HttpStatus.NOT_FOUND));
+        toBeUpdatedUser.setUsername(request.getUsername());
+        toBeUpdatedUser.setEmail(request.getEmail());
+        toBeUpdatedUser.setFullName(request.getFullName());
+
+        toBeUpdatedUser.setTopics(request.getTopicIdList().stream()
+                .map(id -> topicRepository.findById(id).orElseThrow(() -> new UteForumException("Không tìm thấy chủ đề có id = " + id, HttpStatus.NOT_FOUND)))
+                .collect(Collectors.toList()));
+        userRepository.save(toBeUpdatedUser);
+        log.info("User updated successfully");
+
+    }
+
+    @Transactional
+    @Secured({"ROLE_DEAN"})
+    @Override
+    public void createByDean(UserCreateByDeanRequest request) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authenticationFacade.getAuthentication().getPrincipal();
+
+        if (userDetails.getFaculty() == null) {
+            throw new UteForumException("Bạn không thuộc bất kỳ khoa nào", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        String password = generatePassword();
+
+        User toBeSavedUser = new User();
+        toBeSavedUser.setUsername(request.getUsername());
+        toBeSavedUser.setEmail(request.getEmail());
+        toBeSavedUser.setFullName(request.getFullName());
+        toBeSavedUser.setPassword(encoder.encode(password));
+        toBeSavedUser.setRole(roleRepository.findByName(ERole.ROLE_ADVISER)
+                .orElseThrow(() -> new UteForumException("Không tìm được id của ROLE_ADVISER", HttpStatus.INTERNAL_SERVER_ERROR)));
+        toBeSavedUser.setTopics(request.getTopicIdList().stream()
+                .map(id -> topicRepository.findById(id).orElseThrow(() -> new UteForumException("Không tìm thấy chủ đề có id = " + id, HttpStatus.NOT_FOUND)))
+                .collect(Collectors.toList()));
+        toBeSavedUser.setFaculty(userDetails.getFaculty());
+        User saved = userRepository.save(toBeSavedUser);
+        log.info("User created successfully, username = " + saved.getUsername());
+
+        // send email
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append("Xin chào ").append(saved.getFullName()).append("\n");
+        messageBuilder.append("Tài khoản của bạn đã được tạo thành công!\n");
+        messageBuilder.append("Tài khoản: ").append(request.getUsername()).append("\n");
+        messageBuilder.append("Mật khẩu: ").append(password).append("\n");
+        messageBuilder.append("Xin mời đăng nhập tại ").append(loginPath).append(" và đổi mật khẩu").append("\n");
+
+        emailService.sendSimpleMessage(saved.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Tạo tài khoản thành công", messageBuilder.toString());
+
+    }
+
     private SingleUserDetailsResponse convertSingleUser(User user) {
         return modelMapper
                 .map(user, SingleUserDetailsResponse.class);
@@ -193,6 +300,7 @@ public class UserServiceImpl implements UserService {
 
     // this method will generate a random password
     private String generatePassword() {
-        return "1";
+
+        return passwordGenerator.generate(passwordLength);
     }
 }

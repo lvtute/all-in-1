@@ -33,6 +33,13 @@ const deleteQuestion = (id) => {
   return http.delete(`${API_URL}/${id}`, { headers: authHeader() });
 };
 
+const getByDean = (params) => {
+  let config = {
+    headers: authHeader(),
+    params,
+  };
+  return http.get(`${API_URL}/find-by-dean`, config);
+};
 const questionService = {
   getAll,
   getById,
@@ -40,6 +47,7 @@ const questionService = {
   getByAdviserId,
   saveAnswer,
   deleteQuestion,
+  getByDean,
 };
 
 export default questionService;

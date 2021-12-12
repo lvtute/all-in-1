@@ -17,9 +17,13 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     Optional<Topic> findByName(String name);
 
     @Modifying
-    @Query("UPDATE Topic u SET u.isDeleted = true WHERE u.id = :id AND u.isDeleted = false")
+    @Query("UPDATE Topic t SET t.isDeleted = true WHERE t.id = :id AND t.isDeleted = false")
     int softDeleteTopic(@Param("id") Long id);
 
-    List<Topic> findAllByFaculty_Id(Long facultyId);
+    List<Topic> findAllByFaculty_IdAndIsDeletedFalse(Long facultyId);
+
+    List<Topic> findAllByIsDeletedFalse();
+
+    Optional<Topic> findByIdAndIsDeletedFalse(Long id);
 
 }

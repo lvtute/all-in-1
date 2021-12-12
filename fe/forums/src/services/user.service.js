@@ -1,9 +1,7 @@
-// import authHeader from "./auth-header";
+import authHeader from "./auth-header";
 import http from "./http-common";
 
-// const getAdminBoard = () => {
-//   return axios.get(API_URL + "admin", { headers: authHeader() });
-// };
+const API_URL = "/user";
 
 const getAll = (pageNum = 1, pageSize = 5) => {
   pageNum--;
@@ -15,11 +13,31 @@ const getById = (id = 0) => {
 };
 
 const deleteById = (id = 0) => {
-  return http.delete(`/user/${id}`);
+  return http.delete(`/user/${id}`, { headers: authHeader() });
 };
 
 const update = (updateRequestObject) => {
   return http.put("/user", updateRequestObject);
+};
+
+const getByDean = (params) => {
+  let config = {
+    headers: authHeader(),
+    params,
+  };
+  return http.get(`${API_URL}/find-by-dean`, config);
+};
+
+const updateByDean = (requestBody) => {
+  return http.put(`${API_URL}/update-by-dean`, requestBody, {
+    headers: authHeader(),
+  });
+};
+
+const createByDean = (requestBody) => {
+  return http.post(`${API_URL}/create-by-dean`, requestBody, {
+    headers: authHeader(),
+  });
 };
 
 const userService = {
@@ -27,6 +45,9 @@ const userService = {
   getById,
   deleteById,
   update,
+  getByDean,
+  updateByDean,
+  createByDean,
 };
 
 export default userService;
