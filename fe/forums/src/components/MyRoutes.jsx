@@ -16,6 +16,7 @@ import {
   LOGIN_PATH,
   QUESTION_CREATOR_PATH,
   QUESTION_REPLIER,
+  ROLE_ADMIN,
   ROLE_ADVISER,
   ROLE_DEAN,
 } from "../services/constants";
@@ -41,7 +42,7 @@ const MyRoutes = () => {
           <Login />
         </Route>
         <Route path={ADMIN_PATH}>
-          <AdminDashBoard />
+          {role === ROLE_ADMIN ? <AdminDashBoard /> : <Redirect to="/403" />}
         </Route>
         <Route path={`${HOME_PATH}/:id?`}>
           <Home />

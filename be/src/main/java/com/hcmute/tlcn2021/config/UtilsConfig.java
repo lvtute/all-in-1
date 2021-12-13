@@ -27,6 +27,6 @@ public class UtilsConfig {
 
     @Bean
     public RandomStringGenerator passwordGenerator() {
-        return new RandomStringGenerator.Builder().withinRange(33, 45).build();
+        return new RandomStringGenerator.Builder().withinRange('0', 'z').build();
     }
 }

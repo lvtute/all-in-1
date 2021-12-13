@@ -13,7 +13,7 @@ public class FacultyUpdateRequest {
     @NotNull
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Tên khoa không được để trống")
     private String name;
 
 //    public String getName() {

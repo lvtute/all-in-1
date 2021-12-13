@@ -1,11 +1,10 @@
 package com.hcmute.tlcn2021.service.impl;
 
-import com.hcmute.tlcn2021.exception.*;
+import com.hcmute.tlcn2021.exception.FacultyDeleteFailedException;
+import com.hcmute.tlcn2021.exception.FacultyNotFoundException;
 import com.hcmute.tlcn2021.model.Faculty;
-import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.CreateFacultyRequest;
 import com.hcmute.tlcn2021.payload.request.FacultyUpdateRequest;
-import com.hcmute.tlcn2021.payload.request.SignupRequest;
 import com.hcmute.tlcn2021.payload.response.FacultyResponse;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
@@ -14,7 +13,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Service
@@ -28,7 +29,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public List<Faculty> findAll() {
-        return facultyRepository.findAll();
+        return facultyRepository.findAllByIsDeletedFalse();
     }
 
     // hien thi theo id
@@ -39,7 +40,7 @@ public class FacultyServiceImpl implements FacultyService {
     @Override
     public FacultyResponse findById(Long id) {
 
-        Faculty foundUser = facultyRepository.findById(id).orElseThrow(() ->
+        Faculty foundUser = facultyRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() ->
                 new FacultyNotFoundException("User with id = " + id + " can not be found!"));
         return convertSingleFaculty(foundUser);
     }

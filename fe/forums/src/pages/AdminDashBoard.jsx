@@ -10,6 +10,7 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import PasswordChanger from "../components/PasswordChanger";
 
 const AdminDashBoard = () => {
   let match = useRouteMatch();
@@ -18,6 +19,7 @@ const AdminDashBoard = () => {
     user: `${match.url}/user`,
     question: `${match.url}/question`,
     faculty: `${match.url}/faculty`,
+    passwordChanger: `${match.url}/password-changer`,
   });
 
   return (
@@ -30,19 +32,18 @@ const AdminDashBoard = () => {
               <ListGroup>
                 <Link to={`${adminPath.user}`}>
                   <ListGroup.Item action variant="info">
-                    Quản lý User
-                  </ListGroup.Item>
-                </Link>
-
-                <Link to={`${adminPath.question}`}>
-                  <ListGroup.Item action variant="info">
-                    Quản lý câu hỏi
+                    Quản lý Người dùng
                   </ListGroup.Item>
                 </Link>
 
                 <Link to={`${adminPath.faculty}`}>
                   <ListGroup.Item action variant="info">
-                    Quản lý phòng ban
+                    Quản lý Khoa
+                  </ListGroup.Item>
+                </Link>
+                <Link to={`${adminPath.passwordChanger}`}>
+                  <ListGroup.Item action variant="info">
+                    Đổi mật khẩu
                   </ListGroup.Item>
                 </Link>
               </ListGroup>
@@ -58,6 +59,9 @@ const AdminDashBoard = () => {
                 </Route>
                 <Route path={adminPath.faculty}>
                   <FacultyManager />
+                </Route>
+                <Route path={adminPath.passwordChanger}>
+                  <PasswordChanger />
                 </Route>
               </Switch>
             </Col>

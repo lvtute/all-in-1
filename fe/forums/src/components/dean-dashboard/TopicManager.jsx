@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { TOASTIFY_CONFIGS } from "../../services/constants";
+import ValidationMessage from "../ValidationMessage";
 
 const TopicManager = () => {
   const { user } = useSelector((state) => state.auth);
@@ -25,6 +26,7 @@ const TopicManager = () => {
   const [trigger, triggerUseEffect] = useState(false); // this state is only used for refreshing (excecute useEffect)
   const [modalUpdateShow, setModalUpdateShow] = useState(false);
   const [modalCreateShow, setModalCreateShow] = useState(false);
+  const [errorResponse, setErrorResponse] = useState(Object);
 
   const handleClose = () => setModalConfirmDeleteShow(false);
   const handleModalUpdateClose = () => setModalUpdateShow(false);
@@ -71,6 +73,7 @@ const TopicManager = () => {
   const onButtonUpdateClick = (topic) => {
     setSelectedTopic(topic);
     setModalUpdateShow(true);
+    setErrorResponse({});
   };
 
   const handleUpdate = () => {
@@ -87,6 +90,7 @@ const TopicManager = () => {
         setIsSubmitting(false);
         toast.error("Đổi tên thất bại", TOASTIFY_CONFIGS);
         console.log(err.response.data);
+        setErrorResponse(err.response.data);
       });
   };
 
@@ -97,6 +101,7 @@ const TopicManager = () => {
   const onButtonCreateClick = () => {
     setSelectedTopic({});
     setModalCreateShow(true);
+    setErrorResponse({});
   };
 
   const handleCreate = () => {
@@ -113,6 +118,7 @@ const TopicManager = () => {
         setIsSubmitting(false);
         toast.error("Tạo thất bại", TOASTIFY_CONFIGS);
         console.log(err.response.data);
+        setErrorResponse(err.response.data);
       });
   };
 
@@ -213,6 +219,14 @@ const TopicManager = () => {
               defaultValue={selectedTopic.name}
               onChange={handleNewNameChange}
             />
+            <ValidationMessage
+              errorResponse={errorResponse}
+              field="name"
+            ></ValidationMessage>
+            <ValidationMessage
+              errorResponse={errorResponse}
+              field="error"
+            ></ValidationMessage>
           </Modal.Body>
 
           <Modal.Footer>
@@ -237,6 +251,14 @@ const TopicManager = () => {
               defaultValue={selectedTopic.name}
               onChange={handleNewNameChange}
             />
+            <ValidationMessage
+              errorResponse={errorResponse}
+              field="name"
+            ></ValidationMessage>
+            <ValidationMessage
+              errorResponse={errorResponse}
+              field="error"
+            ></ValidationMessage>
           </Modal.Body>
 
           <Modal.Footer>
