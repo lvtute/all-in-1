@@ -12,6 +12,6 @@ public class TopicUpdateRequest {
     @NotNull
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Tên chủ đề không được để trống")
     private String name;
 }

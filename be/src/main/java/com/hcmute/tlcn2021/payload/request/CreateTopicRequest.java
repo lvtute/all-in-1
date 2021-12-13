@@ -8,6 +8,6 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class CreateTopicRequest {
-    @NotBlank
+    @NotBlank(message = "Tên chủ đề không được để trống")
     private String name;
 }
