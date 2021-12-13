@@ -30,7 +30,7 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.findAll(facultyId, pageable));
     }
 
-    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @Secured({"ROLE_ADVISER"})
     @GetMapping("/find-by-adviser-id")
     public ResponseEntity<PaginationResponse> findAllByAdviserId(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
                                                                  @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
@@ -59,5 +59,12 @@ public class QuestionController {
     public ResponseEntity<MessageResponse> delete(@PathVariable Long id) {
         questionService.delete(id);
         return ResponseEntity.ok(new MessageResponse("Xóa câu hỏi thành công"));
+    }
+
+    @Secured({"ROLE_DEAN"})
+    @GetMapping("/find-by-dean")
+    public ResponseEntity<PaginationResponse> findByDean(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                 @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
+        return ResponseEntity.ok(questionService.findAllByDean(noAnswerOnly, pageable));
     }
 }

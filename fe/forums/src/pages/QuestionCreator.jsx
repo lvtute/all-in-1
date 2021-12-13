@@ -47,7 +47,7 @@ const QuestionCreator = () => {
       setTopics([]);
     } else {
       topicService
-        .getById(event.target.value)
+        .getByFacultyId(event.target.value)
         .then((res) => {
           setTopics(res.data);
         })

@@ -9,6 +9,8 @@ import {
   ROLE_ADMIN,
   ADVISER_PATH,
   ADMIN_PATH,
+  ROLE_DEAN,
+  DEAN_PATH,
 } from "../services/constants";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router";
@@ -22,6 +24,8 @@ const NavigationBar = () => {
     useState(false);
   const [showAdminDashboardButton, setShowAdminDashboardButton] =
     useState(true);
+  const [showDeanDashboardButton, setShowDeanDashboardButton] =
+    useState(true);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -32,6 +36,7 @@ const NavigationBar = () => {
     if (user) {
       setShowAdviserDashboardButton(user.role === ROLE_ADVISER);
       setShowAdminDashboardButton(user.role === ROLE_ADMIN);
+      setShowDeanDashboardButton(user.role === ROLE_DEAN);
     }
   }, [user]);
 
@@ -62,6 +67,14 @@ const NavigationBar = () => {
               <>
                 <NavDropdown.Item href={ADMIN_PATH}>
                   Trang QUẢN TRỊ VIÊN
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+              </>
+            )}
+            {showDeanDashboardButton && (
+              <>
+                <NavDropdown.Item href={DEAN_PATH}>
+                  Trang TRƯỞNG KHOA
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
               </>

@@ -1,6 +1,7 @@
 package com.hcmute.tlcn2021.config.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,17 +27,21 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private boolean isDeleted;
 
+    @JsonIgnore
+    private Faculty faculty;
+
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Long id, String username, String email, String password,
                            boolean isDeleted,
-                           Collection<? extends GrantedAuthority> authorities) {
+                           Collection<? extends GrantedAuthority> authorities, Faculty faculty) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
         this.isDeleted = isDeleted;
+        this.faculty = faculty;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -48,7 +53,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 user.isDeleted(),
-                authorities);
+                authorities,
+                user.getFaculty());
     }
 
     @Override
@@ -92,6 +98,10 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean isEnabled() {
         return !isDeleted;
+    }
+
+    public Faculty getFaculty() {
+        return faculty;
     }
 
     @Override

@@ -1,5 +1,5 @@
 import { ListGroup, Container, Row, Col } from "react-bootstrap";
-import QuestionManager from "../components/adviser-dashboard/QuestionManager";
+import QuestionManager from "../components/dean-dashboard/QuestionManager";
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,13 +9,17 @@ import {
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import PasswordChanger from "../components/PasswordChanger";
+import TopicManager from "../components/dean-dashboard/TopicManager";
+import UserManager from "../components/dean-dashboard/UserManager";
 
 const DeanDashBoard = () => {
   let match = useRouteMatch();
   // path enum
-  const adviserPath = Object.freeze({
+  const deanPath = Object.freeze({
     question: `${match.url}/question`,
     passwordChanger: `${match.url}/password-changer`,
+    topic :`${match.url}/topic`,
+    user: `${match.url}/user`
   });
 
   return (
@@ -26,13 +30,25 @@ const DeanDashBoard = () => {
           <Row>
             <Col md="3">
               <ListGroup>
-                <Link to={`${adviserPath.question}`}>
+                <Link to={`${deanPath.question}`}>
                   <ListGroup.Item action variant="info">
                     Quản lý câu hỏi
                   </ListGroup.Item>
                 </Link>
 
-                <Link to={`${adviserPath.passwordChanger}`}>
+                <Link to={`${deanPath.topic}`}>
+                  <ListGroup.Item action variant="info">
+                    Quản lý chủ đề
+                  </ListGroup.Item>
+                </Link>
+
+                <Link to={`${deanPath.user}`}>
+                  <ListGroup.Item action variant="info">
+                    Quản lý Tư vấn viên
+                  </ListGroup.Item>
+                </Link>
+
+                <Link to={`${deanPath.passwordChanger}`}>
                   <ListGroup.Item action variant="info">
                     Đổi mật khẩu
                   </ListGroup.Item>
@@ -42,10 +58,16 @@ const DeanDashBoard = () => {
 
             <Col md="9">
               <Switch>
-                <Route path={adviserPath.question}>
+                <Route path={deanPath.question}>
                   <QuestionManager />
                 </Route>
-                <Route path={adviserPath.passwordChanger}>
+                <Route path={deanPath.topic}>
+                  <TopicManager />
+                </Route>
+                <Route path={deanPath.user}>
+                  <UserManager />
+                </Route>
+                <Route path={deanPath.passwordChanger}>
                   <PasswordChanger />
                 </Route>
               </Switch>

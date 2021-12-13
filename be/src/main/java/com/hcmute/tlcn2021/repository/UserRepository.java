@@ -17,6 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findAllByIsDeletedFalse(Pageable pageable);
 
+    Page<User> findAllByIsDeletedFalseAndFaculty_IdEqualsAndRole_IdEquals(Long facultyId, Long roleId, Pageable pageable);
+
     @Modifying
     @Query("UPDATE User u SET u.isDeleted = true WHERE u.id = :id AND u.isDeleted = false")
     int softDeleteUser(@Param("id") Long id);

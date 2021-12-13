@@ -11,6 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TopicResponse {
     private Long id;
-
     private String name;
 }

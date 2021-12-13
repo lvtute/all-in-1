@@ -1,4 +1,6 @@
+import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import topicService from "../../services/topic.service";
 import {
   Button,
   Container,
@@ -9,15 +11,17 @@ import {
   Table,
 } from "react-bootstrap";
 import { toast } from "react-toastify";
-import facultyService from "../../../services/faculty.service";
-import { TOASTIFY_CONFIGS } from "../../../services/constants";
-import ValidationMessage from "../../ValidationMessage";
+import { TOASTIFY_CONFIGS } from "../../services/constants";
+import ValidationMessage from "../ValidationMessage";
 
-const FacultyManager = () => {
+const TopicManager = () => {
+  const { user } = useSelector((state) => state.auth);
+  let faculty = !!user ? user.faculty : "";
+
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState([]);
   const [modalConfirmDeleteShow, setModalConfirmDeleteShow] = useState(false);
-  const [selectedFaculty, setSelectedFaculty] = useState(Object);
+  const [selectedTopic, setSelectedTopic] = useState(Object);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [trigger, triggerUseEffect] = useState(false); // this state is only used for refreshing (excecute useEffect)
   const [modalUpdateShow, setModalUpdateShow] = useState(false);
@@ -30,32 +34,32 @@ const FacultyManager = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    facultyService
-      .getAll()
+    topicService
+      .getByFacultyId(faculty.id)
       .then((res) => {
         setIsLoading(false);
         setTableData(res.data);
-        console.log(res.data);
+        console.log(res.data.map((u) => u.users));
       })
       .catch((err) => {
         setIsLoading(false);
         console.log(err.response?.data);
       });
-  }, [trigger]);
+  }, [faculty, trigger]);
 
-  const onButtonDeleteClick = (faculty) => {
-    setSelectedFaculty(faculty);
+  const onButtonDeleteClick = (topic) => {
+    setSelectedTopic(topic);
     setModalConfirmDeleteShow(true);
   };
 
   const handleDelete = (id) => {
     setIsSubmitting(true);
-    facultyService
+    topicService
       .deleteById(id)
       .then((res) => {
         setIsSubmitting(false);
         setModalConfirmDeleteShow(false);
-        toast.success("Xóa Khoa thành công", TOASTIFY_CONFIGS);
+        toast.success("Xóa chủ đề thành công", TOASTIFY_CONFIGS);
         triggerUseEffect(!trigger);
       })
       .catch((err) => {
@@ -66,20 +70,20 @@ const FacultyManager = () => {
     console.log(id);
   };
 
-  const onButtonUpdateClick = (faculty) => {
-    setSelectedFaculty(faculty);
+  const onButtonUpdateClick = (topic) => {
+    setSelectedTopic(topic);
     setModalUpdateShow(true);
     setErrorResponse({});
   };
 
   const handleUpdate = () => {
     setIsSubmitting(true);
-    facultyService
-      .update(selectedFaculty)
+    topicService
+      .update(selectedTopic)
       .then((res) => {
         setIsSubmitting(false);
         setModalUpdateShow(false);
-        toast.success("Đổi tên khoa thành công", TOASTIFY_CONFIGS);
+        toast.success("Đổi tên chủ đề thành công", TOASTIFY_CONFIGS);
         triggerUseEffect(!trigger);
       })
       .catch((err) => {
@@ -91,19 +95,19 @@ const FacultyManager = () => {
   };
 
   const handleNewNameChange = (e) => {
-    setSelectedFaculty({ ...selectedFaculty, name: e.target.value });
+    setSelectedTopic({ ...selectedTopic, name: e.target.value });
   };
 
   const onButtonCreateClick = () => {
-    setSelectedFaculty({});
+    setSelectedTopic({});
     setModalCreateShow(true);
     setErrorResponse({});
   };
 
   const handleCreate = () => {
     setIsSubmitting(true);
-    facultyService
-      .create({ name: selectedFaculty.name })
+    topicService
+      .create({ name: selectedTopic.name })
       .then((res) => {
         setIsSubmitting(false);
         setModalCreateShow(false);
@@ -120,7 +124,7 @@ const FacultyManager = () => {
 
   return (
     <>
-      <h4>Quản lý khoa</h4>
+      <h4>{`Quản lý chủ đề trong khoa ${faculty.name}`}</h4>
       <Container>
         {isLoading && (
           <Row style={{ display: "flex", height: "80%" }}>
@@ -137,7 +141,7 @@ const FacultyManager = () => {
           variant="outline-primary"
           onClick={onButtonCreateClick}
         >
-          Tạo khoa mới
+          Tạo chủ đề mới
         </Button>
         <Row style={{ display: "block" }}>
           {!!tableData && (
@@ -146,21 +150,23 @@ const FacultyManager = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Tên khoa</th>
+                    <th>Tên chủ đề</th>
+                    <th>Tư vấn viên</th>
                     <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {tableData.map((faculty) => (
-                    <tr key={faculty.id}>
-                      <td>{faculty.id}</td>
-                      <td>{faculty.name}</td>
+                  {tableData.map((topic) => (
+                    <tr key={topic.id}>
+                      <td>{topic.id}</td>
+                      <td>{topic.name}</td>
+                      <td>{topic.users.map((u) => u.username).join(", ")}</td>
                       <td>
                         <Button
                           onClick={() =>
                             onButtonUpdateClick({
-                              id: faculty.id,
-                              name: faculty.name,
+                              id: topic.id,
+                              name: topic.name,
                             })
                           }
                           variant="outline-warning"
@@ -170,8 +176,8 @@ const FacultyManager = () => {
                         <Button
                           onClick={() =>
                             onButtonDeleteClick({
-                              id: faculty.id,
-                              name: faculty.name,
+                              id: topic.id,
+                              name: topic.name,
                             })
                           }
                           variant="outline-danger"
@@ -188,14 +194,14 @@ const FacultyManager = () => {
         </Row>
         <Modal size="md" show={modalConfirmDeleteShow} onHide={handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>{`Xóa khoa "${selectedFaculty.name}"?`}</Modal.Title>
+            <Modal.Title>{`Xóa chủ đề "${selectedTopic.name}"?`}</Modal.Title>
           </Modal.Header>
 
           <Modal.Footer>
             <Button
               disabled={isSubmitting}
               variant="danger"
-              onClick={() => handleDelete(selectedFaculty.id)}
+              onClick={() => handleDelete(selectedTopic.id)}
             >
               Xóa
             </Button>
@@ -204,13 +210,13 @@ const FacultyManager = () => {
 
         <Modal size="md" show={modalUpdateShow} onHide={handleModalUpdateClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Đổi tên khoa</Modal.Title>
+            <Modal.Title>Đổi tên chủ đề</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form.Label>Nhập tên mới</Form.Label>
             <Form.Control
               type="text"
-              defaultValue={selectedFaculty.name}
+              defaultValue={selectedTopic.name}
               onChange={handleNewNameChange}
             />
             <ValidationMessage
@@ -236,13 +242,13 @@ const FacultyManager = () => {
 
         <Modal size="md" show={modalCreateShow} onHide={handleModalCreateClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Tạo khoa mới</Modal.Title>
+            <Modal.Title>Tạo chủ đề mới</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form.Label>Nhập tên</Form.Label>
             <Form.Control
               type="text"
-              defaultValue={selectedFaculty.name}
+              defaultValue={selectedTopic.name}
               onChange={handleNewNameChange}
             />
             <ValidationMessage
@@ -269,4 +275,4 @@ const FacultyManager = () => {
     </>
   );
 };
-export default FacultyManager;
+export default TopicManager;

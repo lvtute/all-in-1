@@ -11,21 +11,22 @@ import Page403 from "../pages/Page403";
 import {
   ADMIN_PATH,
   ADVISER_PATH,
+  DEAN_PATH,
   HOME_PATH,
   LOGIN_PATH,
   QUESTION_CREATOR_PATH,
   QUESTION_REPLIER,
+  ROLE_ADMIN,
   ROLE_ADVISER,
+  ROLE_DEAN,
 } from "../services/constants";
 import AdviserDashboard from "../pages/AdviserDashboard";
 import { useSelector } from "react-redux";
+import DeanDashBoard from "../pages/DeanDashboard";
 
 const MyRoutes = () => {
   const { user } = useSelector((state) => state.auth);
-  let role = "";
-  if (!!user) {
-    role = user.role;
-  }
+  let role = !!user ? user.role : "";
 
   return (
     <>
@@ -41,21 +42,32 @@ const MyRoutes = () => {
           <Login />
         </Route>
         <Route path={ADMIN_PATH}>
-          <AdminDashBoard />
+          {role === ROLE_ADMIN ? <AdminDashBoard /> : <Redirect to="/403" />}
         </Route>
-        <Route path={HOME_PATH}>
+        <Route path={`${HOME_PATH}/:id?`}>
           <Home />
         </Route>
         <Route path={QUESTION_CREATOR_PATH}>
           <QuestionCreator />
         </Route>
         <Route path={ADVISER_PATH}>
-          <AdviserDashboard />
+          {role === ROLE_ADVISER ? (
+            <AdviserDashboard />
+          ) : (
+            <Redirect to="/403" />
+          )}
+        </Route>
+        <Route path={DEAN_PATH}>
+          {role === ROLE_DEAN ? <DeanDashBoard /> : <Redirect to="/403" />}
         </Route>
         <Route
           path={`${QUESTION_REPLIER}/:id`}
           children={
-            role === ROLE_ADVISER ? <QuestionReplier /> : <Redirect to="/403" />
+            role === ROLE_ADVISER || role === ROLE_DEAN ? (
+              <QuestionReplier />
+            ) : (
+              <Redirect to="/403" />
+            )
           }
         />
         <Route path="/401">

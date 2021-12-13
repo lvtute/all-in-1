@@ -8,6 +8,6 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class CreateFacultyRequest {
-    @NotBlank
+    @NotBlank(message = "Tên khoa không được để trống")
     private String name;
 }

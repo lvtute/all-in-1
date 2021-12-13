@@ -1,12 +1,9 @@
 package com.hcmute.tlcn2021.config.jwt;
 
-
 import com.hcmute.tlcn2021.config.service.UserDetailsImpl;
-import com.hcmute.tlcn2021.exception.UteForumException;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 

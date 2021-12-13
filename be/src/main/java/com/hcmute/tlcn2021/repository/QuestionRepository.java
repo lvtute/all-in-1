@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
@@ -16,9 +18,13 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Page<Question> findAllByIsDeletedFalseAndFaculty_IdEquals(Long facultyId, Pageable pageable);
 
+    Page<Question> findAllByIsDeletedFalseAndFaculty_IdEqualsAndAnswerNull(Long facultyId, Pageable pageable);
+
     Page<Question> findAllByIsDeletedFalseAndAdviser_IdEquals(Long adviserId, Pageable pageable);
 
     Page<Question> findAllByIsDeletedFalseAndAdviser_IdEqualsAndAnswerNull(Long adviserId, Pageable pageable);
+
+    Optional<Question> findByIdAndIsDeletedFalse(Long id);
 
     @Modifying
     @Query("UPDATE Question q SET q.isDeleted = true WHERE q.id = :id AND q.isDeleted = false")

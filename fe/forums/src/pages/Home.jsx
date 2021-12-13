@@ -6,7 +6,14 @@ import { Container, Row, Col, Spinner, Card } from "react-bootstrap";
 import questionService from "../services/question.service";
 import Pagination from "@material-ui/lab/Pagination";
 import createMarkup from "../common/createMarkup";
+import { useParams } from "react-router-dom";
+import { useHistory } from "react-router";
+import { HOME_PATH } from "../services/constants";
 const Home = () => {
+  let { id } = useParams();
+
+  const history = useHistory();
+
   const [facultyList, setFacultyList] = useState([]);
   const [isFacultyLoading, setFacultyLoadingStatus] = useState(true);
 
@@ -26,22 +33,23 @@ const Home = () => {
   const handleClose = () => {
     setShow(false);
     setQuestionDetail(Object);
+    history.push(`${HOME_PATH}`);
   };
   const handleShow = () => setShow(true);
 
   const handleOnQuestionClick = (id) => {
     handleShow();
+    history.push(`${HOME_PATH}/${id}`);
     questionService.getById(id).then((res) => {
       setQuestionDetail(res.data);
       console.log(res.data);
     });
   };
 
-  // const createMarkup = (richText) => {
-  //   return { __html: DOMPurify.sanitize(richText) };
-  // };
-
   useEffect(() => {
+    if (!!id) {
+      handleOnQuestionClick(id);
+    }
     facultyService
       .getAll()
       .then((res) => {
@@ -52,7 +60,8 @@ const Home = () => {
         console.log(err);
         setFacultyLoadingStatus(false);
       });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   useEffect(() => {
     questionService
@@ -189,11 +198,7 @@ const Home = () => {
         </Col>
       </Row>
 
-      <Modal
-        show={show}
-        onHide={handleClose}
-        size="lg"
-      >
+      <Modal show={show} onHide={handleClose} size="lg">
         <Modal.Header>
           <Container>
             <Row>

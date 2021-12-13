@@ -1,13 +1,7 @@
 package com.hcmute.tlcn2021.service;
 
-import com.hcmute.tlcn2021.payload.request.ChangePasswordRequest;
-import com.hcmute.tlcn2021.payload.request.LoginRequest;
-import com.hcmute.tlcn2021.payload.request.SignupRequest;
-import com.hcmute.tlcn2021.payload.request.UserUpdateRequest;
-import com.hcmute.tlcn2021.payload.response.JwtResponse;
-import com.hcmute.tlcn2021.payload.response.MessageResponse;
-import com.hcmute.tlcn2021.payload.response.SingleUserDetailsResponse;
-import com.hcmute.tlcn2021.payload.response.UsersPaginationResponse;
+import com.hcmute.tlcn2021.payload.request.*;
+import com.hcmute.tlcn2021.payload.response.*;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
@@ -25,4 +19,10 @@ public interface UserService {
     UsersPaginationResponse getPage(Pageable pageable);
 
     void changePassword(ChangePasswordRequest changePasswordRequest);
+
+    PaginationResponse findByDean(Pageable pageable);
+
+    void updateByDean(UserUpdateByDeanRequest userUpdateByDeanRequest);
+
+    void createByDean(UserCreateByDeanRequest request);
 }
