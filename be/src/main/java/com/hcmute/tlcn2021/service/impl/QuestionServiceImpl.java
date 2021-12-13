@@ -6,6 +6,7 @@ import com.hcmute.tlcn2021.enumeration.ERole;
 import com.hcmute.tlcn2021.exception.UteForumException;
 import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Question;
+import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.QuestionCreationRequest;
 import com.hcmute.tlcn2021.payload.request.QuestionReplyRequest;
 import com.hcmute.tlcn2021.payload.response.PaginationResponse;
@@ -59,6 +60,9 @@ public class QuestionServiceImpl implements QuestionService {
     @Value("${fe.path.question.home-detail}")
     private String feQuestionHomeDetailPath;
 
+    @Value("${fe.path.question.replier}")
+    private String feQuestionReplierPath;
+
     @Override
     public PaginationResponse findAll(Long facultyId, Pageable pageable) {
         if (ObjectUtils.isEmpty(facultyId) || facultyId == 0) {
@@ -89,7 +93,17 @@ public class QuestionServiceImpl implements QuestionService {
 
         Question savedQuestion = questionRepository.save(toBeSavedQuestion);
         log.info("Question saved successfully!");
+
+        // send email to notify assigned adviser
+        StringBuilder message = new StringBuilder();
+        message.append("Chào ").append(savedQuestion.getAdviser().getFullName()).append(",\n");
+        message.append("Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới.").append("\n");
+        message.append("Mời bạn xem và trả lời tại địa chỉ ").append(feQuestionReplierPath).append(savedQuestion.getId()).append("\n");
+        emailService.sendSimpleMessage(savedQuestion.getAdviser().getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Mời trả lời câu hỏi", message.toString());
+
         return savedQuestion.getId();
+
+
     }
 
     @Override
@@ -112,6 +126,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @Transactional
     @Override
     public QuestionResponse saveAnswer(QuestionReplyRequest questionReplyRequest) {
         Question question = questionRepository.findById(questionReplyRequest.getQuestionId())
@@ -130,13 +145,29 @@ public class QuestionServiceImpl implements QuestionService {
 
         QuestionResponse result = convert(questionRepository.save(question));
 
+        // send email to the question creator
         if (question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
-            // send email notification about answer is submitted
             StringBuilder message = new StringBuilder();
             message.append("Chào ").append(question.getName()).append(",\n");
             message.append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời.\n");
             message.append("Mời bạn xem tại địa chỉ ").append(feQuestionHomeDetailPath).append(question.getId());
             emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã được trả lời", message.toString());
+        }
+
+        // send email to dean for approval
+        if (questionReplyRequest.isConsultDean()) {
+
+            User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN.toString(), question.getFaculty().getId())
+                    .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
+            if (ObjectUtils.isEmpty(dean.getEmail())) {
+                throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
+            }
+
+            StringBuilder message = new StringBuilder();
+            message.append("Chào ").append(dean.getFullName()).append(",\n");
+            message.append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("\n");
+            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionReplierPath).append(question.getId()).append("\n");
+            emailService.sendSimpleMessage(dean.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Thư xin phê duyệt câu trả lời", message.toString());
         }
 
         return result;
