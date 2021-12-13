@@ -28,11 +28,11 @@ public class ApiExceptionHandler {
 
         if (exception.getMessage().contains("'user.unique_username_constraint'")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorMessageResponse("Username already existed"));
+                    .body(new ErrorMessageResponse("Tên người dùng đã tồn tại"));
 
         } else if (exception.getMessage().contains("'user.unique_email_constraint'")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorMessageResponse("Email already existed"));
+                    .body(new ErrorMessageResponse("Email đã được sử dụng"));
 
         }
         throw exception;
