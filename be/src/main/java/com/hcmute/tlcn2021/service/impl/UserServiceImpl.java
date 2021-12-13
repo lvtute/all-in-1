@@ -112,14 +112,11 @@ public class UserServiceImpl implements UserService {
                 encoder.encode(password));
 
         user.setRole(roleRepository.findById(signUpRequest.getRoleId())
-                .orElseThrow(() -> new CustomedRoleNotFoundException("Role with id = " + signUpRequest.getRoleId() + "does not exist")));
+                .orElseThrow(() -> new UteForumException("Vai trò với id = " + signUpRequest.getRoleId() + "không tồn tại.", HttpStatus.NOT_FOUND)));
 
         if (signUpRequest.getFacultyId() != 0) {
-            user.setFaculty(facultyRepository.findById(signUpRequest.getFacultyId())
-                    .orElseThrow(() -> new FacultyNotFoundException(
-                            "Faculty with id = '" + signUpRequest.getFacultyId() +
-                                    "' does not exist"
-                    )));
+            user.setFaculty(facultyRepository.findByIdAndIsDeletedFalse(signUpRequest.getFacultyId())
+                    .orElseThrow(() -> new UteForumException("Khoa với id = '" + signUpRequest.getFacultyId() + "' không tồn tại", HttpStatus.NOT_FOUND)));
         } else {
             user.setFaculty(null);
         }
@@ -147,17 +144,14 @@ public class UserServiceImpl implements UserService {
         Long id = userUpdateRequest.getId();
 
         User foundUser = userRepository.findById(id).orElseThrow(() ->
-                new UserNotFoundException("User with id = " + id + " can not be found!"));
+                new UteForumException("Người dùng với id = " + id + " không tồn tại", HttpStatus.NOT_FOUND));
         foundUser.setRole(roleRepository.findById(userUpdateRequest.getRoleId())
-                .orElseThrow(() -> new CustomedRoleNotFoundException(String
-                        .format("Can not find role with id = '%d'.", userUpdateRequest.getRoleId()))));
+                .orElseThrow(() -> new UteForumException(String.format("Không tìm thấy vai trò với id = '%d'.", userUpdateRequest.getRoleId()), HttpStatus.NOT_FOUND)));
         foundUser.setEmail(userUpdateRequest.getEmail());
 
         if (userUpdateRequest.getFacultyId() != 0) {
             foundUser.setFaculty(facultyRepository.findById(userUpdateRequest.getFacultyId())
-                    .orElseThrow(() -> new FacultyNotFoundException(
-                            "Faculty with id = '" + userUpdateRequest.getFacultyId() +
-                                    "' does not exist")));
+                    .orElseThrow(() -> new UteForumException("Khoa với id = '" + userUpdateRequest.getFacultyId() + "' không tồn tại", HttpStatus.NOT_FOUND)));
         } else {
             foundUser.setFaculty(null);
         }
@@ -170,7 +164,7 @@ public class UserServiceImpl implements UserService {
     public SingleUserDetailsResponse findById(Long id) {
 
         User foundUser = userRepository.findById(id).orElseThrow(() ->
-                new UserNotFoundException("User with id = " + id + " can not be found!"));
+                new UteForumException("Người dùng với id = " + id + " không tồn tại!", HttpStatus.NOT_FOUND));
         return convertSingleUser(foundUser);
     }
 
@@ -180,7 +174,7 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long id) {
         int affectedRows = userRepository.softDeleteUser(id);
         if (affectedRows == 0)
-            throw new UserDeleteFailedException("There is error(s) trying to delete user with id = " + id);
+            throw new UteForumException("Có lỗi xảy ra khi xóa người dùng với id = " + id, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override

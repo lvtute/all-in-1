@@ -8,7 +8,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.lang.reflect.Executable;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,23 +18,6 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UteForumException.class)
     public ResponseEntity<ErrorMessageResponse> handleUteForumException(UteForumException exception) {
         return ResponseEntity.status(exception.getHttpStatus())
-                .body(new ErrorMessageResponse(exception.getMessage()));
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handleUserNotFoundException(UserNotFoundException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageResponse(exception.getMessage()));
-    }
-    @ExceptionHandler(UserDeleteFailedException.class)
-    public ResponseEntity<ErrorMessageResponse> handleUserDeleteFailedException(UserDeleteFailedException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageResponse(exception.getMessage()));
-    }
-
-    @ExceptionHandler(FacultyNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handleFacultyNotFoundException(FacultyNotFoundException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(exception.getMessage()));
     }
 
