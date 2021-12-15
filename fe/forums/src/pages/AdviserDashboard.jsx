@@ -6,11 +6,9 @@ import {
   Route,
   Link,
   useRouteMatch,
-  Redirect,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import PasswordChanger from "../components/PasswordChanger";
-import { ADVISER_PATH } from "../services/constants";
 import AdviserChart from "../components/adviser-dashboard/AdviserChart";
 
 const AdminDashBoard = () => {
@@ -52,13 +50,13 @@ const AdminDashBoard = () => {
 
             <Col md="9">
               <Switch>
-                <Route
+                {/* <Route
                   exact
                   path={ADVISER_PATH}
                   render={() => {
                     return <Redirect to={adviserPath.chart} />;
                   }}
-                />
+                /> */}
                 <Route path={adviserPath.question}>
                   <QuestionManager />
                 </Route>

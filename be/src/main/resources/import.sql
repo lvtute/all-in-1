@@ -36,10 +36,10 @@ INSERT INTO topic(id, name, faculty_id) VALUES (22, 'Trợ giảng, Thỉnh gi�
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `role_id`) VALUES (1, 'admin@gmail.com', @pw, 'admin', 'Luong Van Thuan', 3);
 
 -- IT Users
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (2, 'tranvanc@gmail.com', @pw, 'mod1', N'Trần Văn Nam', 1, 2);
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (3, 'nguyenvana@gmail.com', @pw, 'mod2', 'Nguyen Van A', 1, 1);
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (4, 'jbutt@gmail.com', @pw, 'jamesbutt', N'James Butt', 1, 1);
-INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (5, 'josephine_darakjy@darakjy.org', @pw, 'josephine_darakjy', 'Josephine Darakjy', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (2, 'truongkhoa.cntt.ute@gmail.com', @pw, 'mod1', N'Trần Văn Nam', 1, 2);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (3, 'lvtute@gmail.com', @pw, 'lvtute', 'Lương Văn Thuận', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (4, 'tuvanvien1.cntt.ute@gmail.com', @pw, 'jamesbutt', N'James Butt', 1, 1);
+INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (5, 'tuvanvien2.cntt.ute@gmail.com', @pw, 'josephine_darakjy', 'Josephine Darakjy', 1, 1);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (6, 'art@venere.org', @pw, 'art', 'Art	Venere', 1, 1);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (7, 'lpaprocki@hotmail.com', @pw, 'lpaprocki', 'Lenna Paprocki', 1, 1);
 INSERT INTO user(`id`, `email`, `password`, `username`, `full_name`, `faculty_id`, `role_id`) VALUES (8, 'donette.foller@cox.net', @pw, 'donette.foller', 'Donette Foller', 1, 1);
@@ -70,6 +70,8 @@ INSERT INTO user_topic(`user_id`, topic_id) VALUES (6, 3);
 INSERT INTO user_topic(`user_id`, topic_id) VALUES (7, 4);
 INSERT INTO user_topic(`user_id`, topic_id) VALUES (8, 5);
 INSERT INTO user_topic(`user_id`, topic_id) VALUES (9, 5);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (8, 6);
+INSERT INTO user_topic(`user_id`, topic_id) VALUES (9, 7);
 
 -- user 11-17 / topic 8-15
 INSERT INTO user_topic(`user_id`, topic_id) VALUES (11, 8);
