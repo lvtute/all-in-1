@@ -8,9 +8,12 @@ import {
   Route,
   Link,
   useRouteMatch,
+  Redirect,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import PasswordChanger from "../components/PasswordChanger";
+import AdminChart from "../components/admin-dashboard/AdminChart";
+import { ADMIN_PATH } from "../services/constants";
 
 const AdminDashBoard = () => {
   let match = useRouteMatch();
@@ -20,6 +23,7 @@ const AdminDashBoard = () => {
     question: `${match.url}/question`,
     faculty: `${match.url}/faculty`,
     passwordChanger: `${match.url}/password-changer`,
+    chart: `${match.url}/chart`,
   });
 
   return (
@@ -30,6 +34,11 @@ const AdminDashBoard = () => {
           <Row>
             <Col md="3">
               <ListGroup>
+                <Link to={`${adminPath.chart}`}>
+                  <ListGroup.Item action variant="info">
+                    Thống kê và biểu đồ
+                  </ListGroup.Item>
+                </Link>
                 <Link to={`${adminPath.user}`}>
                   <ListGroup.Item action variant="info">
                     Quản lý Người dùng
@@ -51,6 +60,13 @@ const AdminDashBoard = () => {
 
             <Col md="9">
               <Switch>
+                <Route
+                  exact
+                  path={ADMIN_PATH}
+                  render={() => {
+                    return <Redirect to={adminPath.chart} />;
+                  }}
+                />
                 <Route path={adminPath.user}>
                   <UserManager />
                 </Route>
@@ -62,6 +78,9 @@ const AdminDashBoard = () => {
                 </Route>
                 <Route path={adminPath.passwordChanger}>
                   <PasswordChanger />
+                </Route>
+                <Route path={adminPath.chart}>
+                  <AdminChart />
                 </Route>
               </Switch>
             </Col>

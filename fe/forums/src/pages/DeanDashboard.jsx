@@ -6,11 +6,14 @@ import {
   Route,
   Link,
   useRouteMatch,
+  Redirect,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import PasswordChanger from "../components/PasswordChanger";
 import TopicManager from "../components/dean-dashboard/TopicManager";
 import UserManager from "../components/dean-dashboard/UserManager";
+import { DEAN_PATH } from "../services/constants";
+import DeanChart from "../components/dean-dashboard/DeanChart";
 
 const DeanDashBoard = () => {
   let match = useRouteMatch();
@@ -18,8 +21,9 @@ const DeanDashBoard = () => {
   const deanPath = Object.freeze({
     question: `${match.url}/question`,
     passwordChanger: `${match.url}/password-changer`,
-    topic :`${match.url}/topic`,
-    user: `${match.url}/user`
+    topic: `${match.url}/topic`,
+    user: `${match.url}/user`,
+    chart: `${match.url}/chart`,
   });
 
   return (
@@ -30,6 +34,12 @@ const DeanDashBoard = () => {
           <Row>
             <Col md="3">
               <ListGroup>
+                <Link to={`${deanPath.chart}`}>
+                  <ListGroup.Item action variant="info">
+                    Thống kê và biểu đồ
+                  </ListGroup.Item>
+                </Link>
+
                 <Link to={`${deanPath.question}`}>
                   <ListGroup.Item action variant="info">
                     Quản lý câu hỏi
@@ -58,6 +68,13 @@ const DeanDashBoard = () => {
 
             <Col md="9">
               <Switch>
+                <Route
+                  exact
+                  path={DEAN_PATH}
+                  render={() => {
+                    return <Redirect to={deanPath.chart} />;
+                  }}
+                />
                 <Route path={deanPath.question}>
                   <QuestionManager />
                 </Route>
@@ -69,6 +86,9 @@ const DeanDashBoard = () => {
                 </Route>
                 <Route path={deanPath.passwordChanger}>
                   <PasswordChanger />
+                </Route>
+                <Route path={deanPath.chart}>
+                  <DeanChart />
                 </Route>
               </Switch>
             </Col>

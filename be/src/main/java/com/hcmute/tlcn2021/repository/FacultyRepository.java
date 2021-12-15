@@ -1,6 +1,7 @@
 package com.hcmute.tlcn2021.repository;
 
 import com.hcmute.tlcn2021.model.Faculty;
+import com.hcmute.tlcn2021.payload.response.PieChartDataResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,10 @@ public interface FacultyRepository extends JpaRepository<Faculty, Long> {
     @Modifying
     @Query("UPDATE Faculty u SET u.isDeleted = true WHERE u.id = :id AND u.isDeleted = false")
     int softDeleteFaculty(@Param("id") Long id);
+
+    @Query(" SELECT new com.hcmute.tlcn2021.payload.response.PieChartDataResponse(f.name, COUNT(u.id)) " +
+            " FROM Faculty f JOIN User u ON f.id = u.faculty.id " +
+            " WHERE u.isDeleted = FALSE AND f.isDeleted = FALSE " +
+            " GROUP BY f.name ")
+    List<PieChartDataResponse> getFacultyUserPieChartDataResponse();
 }
