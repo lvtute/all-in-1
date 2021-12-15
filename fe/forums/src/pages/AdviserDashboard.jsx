@@ -6,9 +6,12 @@ import {
   Route,
   Link,
   useRouteMatch,
+  Redirect,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import PasswordChanger from "../components/PasswordChanger";
+import { ADVISER_PATH } from "../services/constants";
+import AdviserChart from "../components/adviser-dashboard/AdviserChart";
 
 const AdminDashBoard = () => {
   let match = useRouteMatch();
@@ -16,6 +19,7 @@ const AdminDashBoard = () => {
   const adviserPath = Object.freeze({
     question: `${match.url}/question`,
     passwordChanger: `${match.url}/password-changer`,
+    chart: `${match.url}/chart`,
   });
 
   return (
@@ -26,6 +30,12 @@ const AdminDashBoard = () => {
           <Row>
             <Col md="3">
               <ListGroup>
+                {/* <Link to={`${adviserPath.chart}`}>
+                  <ListGroup.Item action variant="info">
+                    Thống kê và biểu đồ
+                  </ListGroup.Item>
+                </Link> */}
+
                 <Link to={`${adviserPath.question}`}>
                   <ListGroup.Item action variant="info">
                     Quản lý câu hỏi
@@ -42,11 +52,21 @@ const AdminDashBoard = () => {
 
             <Col md="9">
               <Switch>
+                <Route
+                  exact
+                  path={ADVISER_PATH}
+                  render={() => {
+                    return <Redirect to={adviserPath.chart} />;
+                  }}
+                />
                 <Route path={adviserPath.question}>
                   <QuestionManager />
                 </Route>
                 <Route path={adviserPath.passwordChanger}>
                   <PasswordChanger />
+                </Route>
+                <Route path={adviserPath.chart}>
+                  <AdviserChart />
                 </Route>
               </Switch>
             </Col>

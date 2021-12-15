@@ -1,24 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Row } from "react-bootstrap";
 import Chart from "react-google-charts";
 import chartService from "../../services/chart.service";
 
-const AdminChart = () => {
-  const [facultyUserPieChartData, setFacultyUserPieChartData] = useState([]);
+const DeanChart = () => {
+  const [topicQuestionPieChartData, setTopicQuestionPieChartData] = useState(
+    []
+  );
 
   useEffect(() => {
     chartService
-      .getFacultyUserPieChartData()
+      .getTopicQuestionPieChartData()
       .then((res) => {
-        setFacultyUserPieChartData(res.data);
+        setTopicQuestionPieChartData(res.data);
       })
       .catch((err) => {
         console.log(err.response.data);
       });
   }, []);
 
-  let firstChartData = [["Khoa", "Số lượng"]];
-  facultyUserPieChartData.forEach((e) => {
+  let firstChartData = [["Chủ đề", "Số lượng"]];
+  topicQuestionPieChartData.forEach((e) => {
     firstChartData.push([e[Object.keys(e)[0]], e[Object.keys(e)[1]]]);
   });
 
@@ -27,21 +29,20 @@ const AdminChart = () => {
       <h4>Thống kê và biểu đồ</h4>
       <Row>
         <Chart
-          width={800}
+          width={1600}
           height={500}
           chartType="PieChart"
           loader={<div>Loading Chart</div>}
           data={firstChartData}
           options={{
-            title: "Phân bổ thành viên trong các khoa",
+            title: "Phân bổ câu hỏi theo chủ đề trong khoa",
             // Just add this option
             is3D: true,
           }}
           rootProps={{ "data-testid": "2" }}
         />
-       
       </Row>
     </>
   );
 };
-export default AdminChart;
+export default DeanChart;

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FacultyUserPieChartDataResponse {
-    private String facultyName;
-    private Long amountOfUsers;
+public class PieChartDataResponse {
+    private String key;
+    private Long value;
 }

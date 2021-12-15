@@ -9,8 +9,15 @@ const getFacultyUserPieChartData = () => {
   });
 };
 
+const getTopicQuestionPieChartData = () => {
+  return http.get(`${API_URL}/topic-question-pie-chart`, {
+    headers: authHeader(),
+  });
+};
+
 const chartService = {
   getFacultyUserPieChartData,
+  getTopicQuestionPieChartData,
 };
 
 export default chartService;
