@@ -1,5 +1,6 @@
 package com.hcmute.tlcn2021.repository;
 
+import com.hcmute.tlcn2021.enumeration.ERole;
 import com.hcmute.tlcn2021.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findAllByIsDeletedFalseAndFaculty_IdEqualsAndRole_IdEquals(Long facultyId, Long roleId, Pageable pageable);
 
-    Optional<User> findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(String roleName, Long facultyId);
+    Optional<User> findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole roleName, Long facultyId);
 
     @Modifying
     @Query("UPDATE User u SET u.isDeleted = true WHERE u.id = :id AND u.isDeleted = false")

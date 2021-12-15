@@ -157,7 +157,7 @@ public class QuestionServiceImpl implements QuestionService {
         // send email to dean for approval
         if (questionReplyRequest.isConsultDean()) {
 
-            User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN.toString(), question.getFaculty().getId())
+            User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
                     .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
             if (ObjectUtils.isEmpty(dean.getEmail())) {
                 throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
