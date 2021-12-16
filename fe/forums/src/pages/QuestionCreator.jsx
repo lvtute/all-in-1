@@ -1,4 +1,4 @@
-import { Button, Col, Form } from "react-bootstrap";
+import { Button, Col, Form, Spinner } from "react-bootstrap";
 import CenteredTitle from "../components/CenteredTitle";
 import facultyService from "../services/faculty.service";
 import topicService from "../services/topic.service";
@@ -170,6 +170,15 @@ const QuestionCreator = () => {
         </Form.Group>
         <ValidationMessage errorResponse={errorResponse} field="error" />
         <Button disabled={isSubmitting} variant="primary" type="submit">
+          {isSubmitting && (
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
+          )}
           Submit
         </Button>
       </Form>

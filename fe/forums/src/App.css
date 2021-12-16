@@ -58,7 +58,7 @@ td {
   border: 1px solid #ccc;
 }
 .editor-class {
-  background-color:rgb(253, 253, 253);
+  background-color: rgb(253, 253, 253);
   padding: 1%;
   border: 1px solid #ccc;
 }
@@ -69,11 +69,17 @@ td {
 .rdw-editor-main {
   /* height: 100%; */
   height: auto !important;
-
 }
 
 /* end style for editor */
 
 .validation-message {
   color: red;
+}
+button.list-group-item.list-group-item-info.list-group-item-action {
+  font-size: 1.2em;
+  font-weight: bold;
+  background: #e3f2fd;
+  border: none;
+  border-radius: 25px;
 }
