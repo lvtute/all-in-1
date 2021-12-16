@@ -146,7 +146,7 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionResponse result = convert(questionRepository.save(question));
 
         // send email to the question creator
-        if (question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
+        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
             StringBuilder message = new StringBuilder();
             message.append("Chào ").append(question.getName()).append(",\n");
             message.append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời.\n");
@@ -193,7 +193,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw new UteForumException("Xóa không thành công", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        if (question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
+        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
             // send email notification about question is deleted
             String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
             emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã bị xóa", message);
