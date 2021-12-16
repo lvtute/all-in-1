@@ -24,6 +24,7 @@ public class ChartServiceImpl implements ChartService {
     @Autowired
     private AuthenticationFacade authenticationFacade;
 
+    @Secured({"ROLE_ADMIN"})
     @Override
     public List<PieChartDataResponse> getFacultyUserPieChartData() {
         return facultyRepository.getFacultyUserPieChartDataResponse();

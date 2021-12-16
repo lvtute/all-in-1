@@ -44,7 +44,7 @@ public class TopicController {
 
     @Secured({"ROLE_ADMIN", "ROLE_DEAN"})
     @PutMapping
-    public ResponseEntity<MessageResponse> update(@RequestBody TopicUpdateRequest topicUpdateRequest) {
+    public ResponseEntity<MessageResponse> update(@RequestBody @Valid TopicUpdateRequest topicUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK.value())
                 .body(new MessageResponse(String.format("Chủ đề %s được cập nhật thành công!", topicService.update(topicUpdateRequest).getName())));
     }

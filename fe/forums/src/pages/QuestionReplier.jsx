@@ -224,6 +224,15 @@ const QuestionReplier = () => {
           )}
         </Form.Group>
         <Button disabled={isSubmitting} variant="primary" type="submit">
+          {isSubmitting && (
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
+          )}
           Lưu
         </Button>
       </Form>
