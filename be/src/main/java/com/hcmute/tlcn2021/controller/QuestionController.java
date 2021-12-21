@@ -28,14 +28,15 @@ public class QuestionController {
     public ResponseEntity<PaginationResponse> findAll(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
                                                       @RequestParam(required = false) Long facultyId,
                                                       @RequestParam(required = false) String searchString) {
-        return ResponseEntity.ok(questionService.findAll(facultyId,searchString,pageable));
+        return ResponseEntity.ok(questionService.findAll(facultyId, searchString, pageable));
     }
 
     @Secured({"ROLE_ADVISER"})
     @GetMapping("/find-by-adviser-id")
     public ResponseEntity<PaginationResponse> findAllByAdviserId(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                 @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
-        return ResponseEntity.ok(questionService.findAllByAdviserId(noAnswerOnly, pageable));
+                                                                 @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly,
+                                                                 @RequestParam(required = false, defaultValue = "") String searchString) {
+        return ResponseEntity.ok(questionService.findAllByAdviserId(noAnswerOnly, searchString, pageable));
     }
 
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
@@ -65,7 +66,7 @@ public class QuestionController {
     @Secured({"ROLE_DEAN"})
     @GetMapping("/find-by-dean")
     public ResponseEntity<PaginationResponse> findByDean(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                 @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
+                                                         @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
         return ResponseEntity.ok(questionService.findAllByDean(noAnswerOnly, pageable));
     }
 }

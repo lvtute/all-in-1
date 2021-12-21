@@ -20,14 +20,16 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     String CHECK_PRIVATE_CONDITION = " AND q.isPrivate = FALSE ";
     String CHECK_FACULTY_ID_CONDITION = " AND q.faculty.id = :facultyId ";
     String CHECK_QUESTION_IS_ANSWERED = " AND q.answer IS NOT NULL ";
+    String CHECK_QUESTION_IS_NOT_ANSWERED = " AND q.answer IS NULL ";
+    String CHECK_ADVISER_ID_CONDITION = " AND q.adviser.id = :adviserId ";
 
     Page<Question> findAllByIsDeletedFalseAndFaculty_IdEquals(Long facultyId, Pageable pageable);
 
     Page<Question> findAllByIsDeletedFalseAndFaculty_IdEqualsAndAnswerNull(Long facultyId, Pageable pageable);
 
-    Page<Question> findAllByIsDeletedFalseAndAdviser_IdEquals(Long adviserId, Pageable pageable);
+//    Page<Question> findAllByIsDeletedFalseAndAdviser_IdEquals(Long adviserId, Pageable pageable);
 
-    Page<Question> findAllByIsDeletedFalseAndAdviser_IdEqualsAndAnswerNull(Long adviserId, Pageable pageable);
+//    Page<Question> findAllByIsDeletedFalseAndAdviser_IdEqualsAndAnswerNull(Long adviserId, Pageable pageable);
 
     Optional<Question> findByIdAndIsDeletedFalse(Long id);
 
@@ -48,4 +50,16 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     )
     Page<Question> findByFaculty_IdEqualsAndIsPrivateFalseAndSearchString(@Param("searchString") String searchString, @Param("facultyId") Long facultyId, Pageable pageable);
 
+
+    @Query(value = BASIC_QUESTION_SEARCH_QUERY
+            + CHECK_ADVISER_ID_CONDITION
+            + CHECK_QUESTION_IS_NOT_ANSWERED
+    )
+    Page<Question> findByAnswerNullAndAdviserIdEqualsAndSearchString(@Param("adviserId") Long adviserId, @Param("searchString") String searchString, Pageable pageable);
+
+    @Query(value = BASIC_QUESTION_SEARCH_QUERY
+            + CHECK_ADVISER_ID_CONDITION
+            + CHECK_QUESTION_IS_ANSWERED
+    )
+    Page<Question> findByAnswerNotNullAndAdviserIdEqualsAndSearchString(@Param("adviserId") Long adviserId, @Param("searchString") String searchString, Pageable pageable);
 }

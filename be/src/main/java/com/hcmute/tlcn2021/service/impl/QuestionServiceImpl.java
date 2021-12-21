@@ -6,7 +6,6 @@ import com.hcmute.tlcn2021.enumeration.ERole;
 import com.hcmute.tlcn2021.exception.UteForumException;
 import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Question;
-import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.QuestionCreationRequest;
 import com.hcmute.tlcn2021.payload.request.QuestionReplyRequest;
 import com.hcmute.tlcn2021.payload.response.PaginationResponse;
@@ -22,8 +21,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,9 +28,10 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.hcmute.tlcn2021.enumeration.QuestionStatus;
 
 @Log4j2
 @Service
@@ -69,8 +67,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public PaginationResponse findAll(Long facultyId, String searchString, Pageable pageable) {
 
-        if (ObjectUtils.isEmpty(searchString)) searchString = "";
-        else searchString = searchString.toUpperCase();
+        searchString = standardizeSearchString(searchString);
 
         if (ObjectUtils.isEmpty(facultyId) || facultyId == 0) {
             Page<Question> queryResult = questionRepository.findByIsPrivateFalseAndSearchString(searchString, pageable);
@@ -122,14 +119,16 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
-    public PaginationResponse findAllByAdviserId(Boolean noAnswerOnly, Pageable pageable) {
+    public PaginationResponse findAllByAdviserId(Boolean noAnswerOnly, String searchString, Pageable pageable) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authenticationFacade.getAuthentication().getPrincipal();
 
+        searchString = standardizeSearchString(searchString);
+
         if (noAnswerOnly.equals(true)) {
-            return convert(questionRepository.findAllByIsDeletedFalseAndAdviser_IdEqualsAndAnswerNull(userDetails.getId(), pageable));
+            return convert(questionRepository.findByAnswerNullAndAdviserIdEqualsAndSearchString(userDetails.getId(), searchString, pageable));
         }
 
-        return convert(questionRepository.findAllByIsDeletedFalseAndAdviser_IdEquals(userDetails.getId(), pageable));
+        return convert(questionRepository.findByAnswerNotNullAndAdviserIdEqualsAndSearchString(userDetails.getId(), searchString, pageable));
     }
 
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
@@ -145,11 +144,17 @@ public class QuestionServiceImpl implements QuestionService {
                 && !userDetails.getId().equals(question.getAdviser().getId())) {
             throw new UteForumException("Bạn không phải là tư vấn viên được giao của câu hỏi này", HttpStatus.FORBIDDEN);
         }
-        if (userDetails.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(ERole.ROLE_DEAN.toString()))) {
-            question.setApprovedByDean(true);
-        }
         question.setAnswer(questionReplyRequest.getAnswer());
 
+        if (userDetails.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(ERole.ROLE_DEAN.toString()))) {
+            question.setApprovedByDean(true);
+            question.setStatus(QuestionStatus.NONE);
+        }
+
+        if (questionReplyRequest.isConsultDean()) {
+            question.setApprovedByDean(false);
+            question.setStatus(QuestionStatus.PASSED_TO_DEAN);
+        }
         QuestionResponse result = convert(questionRepository.save(question));
 
         // send email to the question creator
@@ -235,5 +240,13 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionResponse convert(Question question) {
 
         return modelMapper.map(question, QuestionResponse.class);
+    }
+
+    private String standardizeSearchString(String searchString) {
+        String result;
+        if (ObjectUtils.isEmpty(searchString)) result = "";
+        else result = searchString.toUpperCase();
+
+        return result;
     }
 }

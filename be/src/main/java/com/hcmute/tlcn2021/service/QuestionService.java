@@ -13,7 +13,7 @@ public interface QuestionService {
 
     QuestionResponse findById(Long id);
 
-    PaginationResponse findAllByAdviserId(Boolean noAnswerOnly, Pageable pageable);
+    PaginationResponse findAllByAdviserId(Boolean noAnswerOnly, String searchString, Pageable pageable);
 
     QuestionResponse saveAnswer(QuestionReplyRequest questionReplyRequest);
 
