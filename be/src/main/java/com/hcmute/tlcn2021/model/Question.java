@@ -1,6 +1,9 @@
 package com.hcmute.tlcn2021.model;
 
+import com.hcmute.tlcn2021.enumeration.QuestionStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -8,6 +11,8 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Question extends BaseEntity {
 
     private String title;
@@ -40,6 +45,10 @@ public class Question extends BaseEntity {
     @Column(columnDefinition = "boolean default false")
     private boolean approvedByDean;
 
-    private Boolean agreeToReceiveEmailNotification;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isPrivate;
+
+    @Enumerated(EnumType.STRING)
+    private QuestionStatus status;
 
 }

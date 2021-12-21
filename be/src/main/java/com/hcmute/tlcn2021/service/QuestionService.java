@@ -7,7 +7,7 @@ import com.hcmute.tlcn2021.payload.response.QuestionResponse;
 import org.springframework.data.domain.Pageable;
 
 public interface QuestionService {
-    PaginationResponse findAll(Long facultyId, Pageable pageable);
+    PaginationResponse findAll(Long facultyId, String searchString, Pageable pageable);
 
     Long create(QuestionCreationRequest request);
 

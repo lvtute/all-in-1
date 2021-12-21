@@ -22,6 +22,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -64,11 +67,16 @@ public class QuestionServiceImpl implements QuestionService {
     private String feQuestionReplierPath;
 
     @Override
-    public PaginationResponse findAll(Long facultyId, Pageable pageable) {
+    public PaginationResponse findAll(Long facultyId, String searchString, Pageable pageable) {
+
+        if (ObjectUtils.isEmpty(searchString)) searchString = "";
+        else searchString = searchString.toUpperCase();
+
         if (ObjectUtils.isEmpty(facultyId) || facultyId == 0) {
-            return convert(questionRepository.findAllByIsDeletedFalse(pageable));
+            Page<Question> queryResult = questionRepository.findByIsPrivateFalseAndSearchString(searchString, pageable);
+            return convert(queryResult);
         }
-        return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEquals(facultyId, pageable));
+        return convert(questionRepository.findByFaculty_IdEqualsAndIsPrivateFalseAndSearchString(searchString, facultyId, pageable));
     }
 
     @Transactional
@@ -102,7 +110,6 @@ public class QuestionServiceImpl implements QuestionService {
         emailService.sendSimpleMessage(savedQuestion.getAdviser().getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Mời trả lời câu hỏi", message.toString());
 
         return savedQuestion.getId();
-
 
     }
 
@@ -146,29 +153,29 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionResponse result = convert(questionRepository.save(question));
 
         // send email to the question creator
-        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
-            StringBuilder message = new StringBuilder();
-            message.append("Chào ").append(question.getName()).append(",\n");
-            message.append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời.\n");
-            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionHomeDetailPath).append(question.getId());
-            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã được trả lời", message.toString());
-        }
+//        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
+//            StringBuilder message = new StringBuilder();
+//            message.append("Chào ").append(question.getName()).append(",\n");
+//            message.append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời.\n");
+//            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionHomeDetailPath).append(question.getId());
+//            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã được trả lời", message.toString());
+//        }
 
         // send email to dean for approval
-        if (questionReplyRequest.isConsultDean()) {
-
-            User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
-                    .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
-            if (ObjectUtils.isEmpty(dean.getEmail())) {
-                throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
-            }
-
-            StringBuilder message = new StringBuilder();
-            message.append("Chào ").append(dean.getFullName()).append(",\n");
-            message.append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("\n");
-            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionReplierPath).append(question.getId()).append("\n");
-            emailService.sendSimpleMessage(dean.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Thư xin phê duyệt câu trả lời", message.toString());
-        }
+//        if (questionReplyRequest.isConsultDean()) {
+//
+//            User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
+//                    .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
+//            if (ObjectUtils.isEmpty(dean.getEmail())) {
+//                throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
+//            }
+//
+//            StringBuilder message = new StringBuilder();
+//            message.append("Chào ").append(dean.getFullName()).append(",\n");
+//            message.append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("\n");
+//            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionReplierPath).append(question.getId()).append("\n");
+//            emailService.sendSimpleMessage(dean.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Thư xin phê duyệt câu trả lời", message.toString());
+//        }
 
         return result;
     }
@@ -192,12 +199,12 @@ public class QuestionServiceImpl implements QuestionService {
         if (updatedRows == 0) {
             throw new UteForumException("Xóa không thành công", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
-            // send email notification about question is deleted
-            String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
-            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã bị xóa", message);
-        }
+//
+//        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
+//            // send email notification about question is deleted
+//            String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
+//            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã bị xóa", message);
+//        }
     }
 
     @Secured({"ROLE_DEAN"})

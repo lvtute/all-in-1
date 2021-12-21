@@ -26,8 +26,9 @@ public class QuestionController {
 
     @GetMapping
     public ResponseEntity<PaginationResponse> findAll(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                      @RequestParam(required = false) Long facultyId) {
-        return ResponseEntity.ok(questionService.findAll(facultyId, pageable));
+                                                      @RequestParam(required = false) Long facultyId,
+                                                      @RequestParam(required = false) String searchString) {
+        return ResponseEntity.ok(questionService.findAll(facultyId,searchString,pageable));
     }
 
     @Secured({"ROLE_ADVISER"})
