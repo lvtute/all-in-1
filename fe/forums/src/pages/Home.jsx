@@ -97,6 +97,7 @@ const Home = () => {
 
   const handleSearchStringChange = (e) => {
     setSearchString(e.target.value);
+    if (e.target.value === "") setSearchStringState("");
   };
 
   const handleSeachButtonClick = () => {
