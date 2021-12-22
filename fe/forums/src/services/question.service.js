@@ -40,6 +40,13 @@ const getByDean = (params) => {
   };
   return http.get(`${API_URL}/find-by-dean`, config);
 };
+
+const transferQuestion = (requestData) => {
+  return http.put(`${API_URL}/transfer`, requestData, {
+    headers: authHeader(),
+  });
+};
+
 const questionService = {
   getAll,
   getById,
@@ -48,6 +55,7 @@ const questionService = {
   saveAnswer,
   deleteQuestion,
   getByDean,
+  transferQuestion,
 };
 
 export default questionService;

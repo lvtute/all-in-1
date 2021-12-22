@@ -125,7 +125,7 @@ const QuestionManager = () => {
                       <FormControl
                       defaultValue={searchString}
                         onChange={handleSearchStringChange}
-                        placeholder="Tìm kiếm"
+                        placeholder="Nhập từ khóa"
                       />
                     </InputGroup>
                   </Col>

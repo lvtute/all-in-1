@@ -8,6 +8,7 @@ import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Question;
 import com.hcmute.tlcn2021.payload.request.QuestionCreationRequest;
 import com.hcmute.tlcn2021.payload.request.QuestionReplyRequest;
+import com.hcmute.tlcn2021.payload.request.QuestionTransferRequest;
 import com.hcmute.tlcn2021.payload.response.PaginationResponse;
 import com.hcmute.tlcn2021.payload.response.QuestionResponse;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
@@ -135,6 +136,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     @Override
     public QuestionResponse saveAnswer(QuestionReplyRequest questionReplyRequest) {
+
         Question question = questionRepository.findById(questionReplyRequest.getQuestionId())
                 .orElseThrow(() -> new UteForumException("Câu hỏi không tồn tài", HttpStatus.NOT_FOUND));
 
@@ -200,11 +202,8 @@ public class QuestionServiceImpl implements QuestionService {
             throw new UteForumException("Bạn không phải là tư vấn viên được giao của câu hỏi này", HttpStatus.FORBIDDEN);
         }
 
-        int updatedRows = questionRepository.softDelete(questionId);
-        if (updatedRows == 0) {
-            throw new UteForumException("Xóa không thành công", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-//
+        questionRepository.deleteById(questionId);
+
 //        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
 //            // send email notification about question is deleted
 //            String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
@@ -223,6 +222,29 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEquals(faculty.getId(), pageable));
+    }
+
+    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @Override
+    public void transferQuestion(QuestionTransferRequest request) {
+
+        Question toBeSavedQuestion = questionRepository.findById(request.getQuestionId())
+                .orElseThrow(() -> new UteForumException("Câu hỏi không tồn tại", HttpStatus.NOT_FOUND));
+
+        toBeSavedQuestion.setTopic(topicRepository.findById(request.getTopicId())
+                .orElseThrow(() -> new UteForumException("Chủ đề không tồn tại", HttpStatus.NOT_FOUND)));
+
+        Optional<Long> optionalAdviserId = userRepository.findAdviserIdForAssigningQuestionByTopicId(toBeSavedQuestion.getTopic().getId());
+        Long adviserId = optionalAdviserId.orElseGet(() -> userRepository.findAdviserIdForAssigningQuestionByFaculty(toBeSavedQuestion.getTopic().getFaculty().getId())
+                .orElseThrow(() -> new UteForumException("Không tìm được tư vấn viên phù hợp", HttpStatus.NOT_FOUND)));
+
+        toBeSavedQuestion.setAdviser(userRepository.findById(adviserId)
+                .orElseThrow(() -> new UteForumException("Không tìm được tư vấn viên phù hợp", HttpStatus.NOT_FOUND)));
+
+        Question savedQuestion = questionRepository.save(toBeSavedQuestion);
+        log.info("Question saved successfully!");
+
+        // TODO send email to new adviser
     }
 
     private void increaseQuestionViews(Question question) {
