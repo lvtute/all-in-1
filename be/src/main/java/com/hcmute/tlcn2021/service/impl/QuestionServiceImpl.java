@@ -9,6 +9,7 @@ import com.hcmute.tlcn2021.model.Question;
 import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.QuestionCreationRequest;
 import com.hcmute.tlcn2021.payload.request.QuestionReplyRequest;
+import com.hcmute.tlcn2021.payload.request.QuestionTransferRequest;
 import com.hcmute.tlcn2021.payload.response.PaginationResponse;
 import com.hcmute.tlcn2021.payload.response.QuestionResponse;
 import com.hcmute.tlcn2021.repository.FacultyRepository;
@@ -18,6 +19,7 @@ import com.hcmute.tlcn2021.repository.UserRepository;
 import com.hcmute.tlcn2021.service.EmailService;
 import com.hcmute.tlcn2021.service.QuestionService;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +31,11 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.hcmute.tlcn2021.enumeration.QuestionStatus;
 
 @Log4j2
 @Service
@@ -64,11 +69,15 @@ public class QuestionServiceImpl implements QuestionService {
     private String feQuestionReplierPath;
 
     @Override
-    public PaginationResponse findAll(Long facultyId, Pageable pageable) {
+    public PaginationResponse findAll(Long facultyId, String searchString, Pageable pageable) {
+
+        searchString = standardizeSearchString(searchString);
+
         if (ObjectUtils.isEmpty(facultyId) || facultyId == 0) {
-            return convert(questionRepository.findAllByIsDeletedFalse(pageable));
+            Page<Question> queryResult = questionRepository.findByIsPrivateFalseAndSearchString(searchString, pageable);
+            return convert(queryResult);
         }
-        return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEquals(facultyId, pageable));
+        return convert(questionRepository.findByFaculty_IdEqualsAndIsPrivateFalseAndSearchString(searchString, facultyId, pageable));
     }
 
     @Transactional
@@ -95,40 +104,58 @@ public class QuestionServiceImpl implements QuestionService {
         log.info("Question saved successfully!");
 
         // send email to notify assigned adviser
-        StringBuilder message = new StringBuilder();
-        message.append("Chào ").append(savedQuestion.getAdviser().getFullName()).append(",\n");
-        message.append("Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới.").append("\n");
-        message.append("Mời bạn xem và trả lời tại địa chỉ ").append(feQuestionReplierPath).append(savedQuestion.getId()).append("\n");
-        emailService.sendSimpleMessage(savedQuestion.getAdviser().getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Mời trả lời câu hỏi", message.toString());
+        Runnable sendEmail = () -> {
+            String message = "<p>" + "Chào " + savedQuestion.getAdviser().getFullName() + "</p>" +
+                    "<p>" + "Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới." + "</p>" +
+                    "<p>" + MessageFormat.format("Mời bạn xem và trả lời tại <a href=\"{0}\">{0}</a>", feQuestionReplierPath + savedQuestion.getId()) + "</p>";
+            emailService.sendHtmlMessage(savedQuestion.getAdviser().getEmail(), "Mời trả lời câu hỏi", message);
+
+        };
+        new Thread(sendEmail).start();
 
         return savedQuestion.getId();
 
-
     }
+
+    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @Override
+    public QuestionResponse findByIdIncludingPrivate(Long id) {
+
+        Question foundQuestion = questionRepository.findById(id).orElseThrow(() -> new UteForumException("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND));
+
+        increaseQuestionViews(foundQuestion);
+        return convert(foundQuestion);
+    }
+
 
     @Override
     public QuestionResponse findById(Long id) {
-        Question foundQuestion = questionRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new UteForumException("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND));
+
+        Question foundQuestion = questionRepository.findByIdAndIsPrivateFalse(id).orElseThrow(() -> new UteForumException("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND));
+
         increaseQuestionViews(foundQuestion);
         return convert(foundQuestion);
     }
 
     @Override
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
-    public PaginationResponse findAllByAdviserId(Boolean noAnswerOnly, Pageable pageable) {
+    public PaginationResponse findAllByAdviserId(Boolean noAnswerOnly, String searchString, Pageable pageable) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authenticationFacade.getAuthentication().getPrincipal();
 
+        searchString = standardizeSearchString(searchString);
+
         if (noAnswerOnly.equals(true)) {
-            return convert(questionRepository.findAllByIsDeletedFalseAndAdviser_IdEqualsAndAnswerNull(userDetails.getId(), pageable));
+            return convert(questionRepository.findByAnswerNullAndAdviserIdEqualsAndSearchString(userDetails.getId(), searchString, pageable));
         }
 
-        return convert(questionRepository.findAllByIsDeletedFalseAndAdviser_IdEquals(userDetails.getId(), pageable));
+        return convert(questionRepository.findByAnswerNotNullAndAdviserIdEqualsAndSearchString(userDetails.getId(), searchString, pageable));
     }
 
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
     @Transactional
     @Override
     public QuestionResponse saveAnswer(QuestionReplyRequest questionReplyRequest) {
+
         Question question = questionRepository.findById(questionReplyRequest.getQuestionId())
                 .orElseThrow(() -> new UteForumException("Câu hỏi không tồn tài", HttpStatus.NOT_FOUND));
 
@@ -138,37 +165,53 @@ public class QuestionServiceImpl implements QuestionService {
                 && !userDetails.getId().equals(question.getAdviser().getId())) {
             throw new UteForumException("Bạn không phải là tư vấn viên được giao của câu hỏi này", HttpStatus.FORBIDDEN);
         }
-        if (userDetails.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(ERole.ROLE_DEAN.toString()))) {
-            question.setApprovedByDean(true);
-        }
         question.setAnswer(questionReplyRequest.getAnswer());
 
-        QuestionResponse result = convert(questionRepository.save(question));
-
-        // send email to the question creator
-        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
-            StringBuilder message = new StringBuilder();
-            message.append("Chào ").append(question.getName()).append(",\n");
-            message.append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời.\n");
-            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionHomeDetailPath).append(question.getId());
-            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã được trả lời", message.toString());
+        if (userDetails.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(ERole.ROLE_DEAN.toString()))) {
+            question.setApprovedByDean(true);
+            question.setStatus(QuestionStatus.NONE);
         }
 
-        // send email to dean for approval
         if (questionReplyRequest.isConsultDean()) {
-
-            User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
-                    .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
-            if (ObjectUtils.isEmpty(dean.getEmail())) {
-                throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
-            }
-
-            StringBuilder message = new StringBuilder();
-            message.append("Chào ").append(dean.getFullName()).append(",\n");
-            message.append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("\n");
-            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionReplierPath).append(question.getId()).append("\n");
-            emailService.sendSimpleMessage(dean.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Thư xin phê duyệt câu trả lời", message.toString());
+            question.setApprovedByDean(false);
+            question.setStatus(QuestionStatus.PASSED_TO_DEAN);
         }
+        question.setPrivate(BooleanUtils.isTrue(questionReplyRequest.getIsPrivate()));
+
+        Question saved = questionRepository.save(question);
+        QuestionResponse result = convert(saved);
+
+//      send email to the question creator
+
+        new Thread(() -> {
+            StringBuilder message = new StringBuilder();
+            message.append("<p>").append("Chào ").append(question.getName()).append("</p>");
+            message.append("<p>").append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời bởi ").append(result.getAdviserFullName()).append("</p>");
+            message.append("<p>").append(result.getAnswer()).append("</p>");
+            if (!saved.isPrivate()) {
+                message.append("<p>").append(MessageFormat.format("Mời bạn xem tại địa chỉ <a href=\"{0}\">{0}</a>", feQuestionHomeDetailPath + question.getId())).append("</p>");
+            } else {
+                message.append("<p>").append("Tư vấn viên đã đánh dấu câu hỏi này là riêng tư. Vì vậy bạn chỉ mình bạn mới có thể xem câu trả lời tại đây, và câu hỏi sẽ không xuất hiện trên web tư vấn.").append("</p>");
+            }
+            emailService.sendHtmlMessage(question.getEmail(), "Câu hỏi của bạn đã được trả lời", message.toString());
+
+            // send email to dean for approval
+            if (questionReplyRequest.isConsultDean()) {
+
+                User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
+                        .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
+                if (ObjectUtils.isEmpty(dean.getEmail())) {
+                    throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
+                }
+
+                message = new StringBuilder();
+                message.append("<p>").append("Chào ").append(dean.getFullName()).append("</p>");
+                message.append("<p>").append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("</p>");
+                message.append("<p>").append(MessageFormat.format("Mời bạn xem tại địa chỉ <a href=\"{0}\">{0}</a>", feQuestionReplierPath + question.getId())).append("</p>");
+                emailService.sendHtmlMessage(dean.getEmail(), "Thư xin phê duyệt câu trả lời", message.toString());
+            }
+        }).start();
+
 
         return result;
     }
@@ -188,29 +231,64 @@ public class QuestionServiceImpl implements QuestionService {
             throw new UteForumException("Bạn không phải là tư vấn viên được giao của câu hỏi này", HttpStatus.FORBIDDEN);
         }
 
-        int updatedRows = questionRepository.softDelete(questionId);
-        if (updatedRows == 0) {
-            throw new UteForumException("Xóa không thành công", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        questionRepository.deleteById(questionId);
 
-        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
-            // send email notification about question is deleted
+        // send email notification about question is deleted
+        new Thread(() -> {
             String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
-            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã bị xóa", message);
-        }
+            emailService.sendSimpleMessage(question.getEmail(), "Câu hỏi đã bị xóa", message);
+        }).start();
+
     }
 
     @Secured({"ROLE_DEAN"})
     @Override
-    public PaginationResponse findAllByDean(Boolean noAnswerOnly, Pageable pageable) {
+    public PaginationResponse findAllByDean(String searchString, Boolean noAnswerOnly, Boolean passedToDean, Pageable pageable) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authenticationFacade.getAuthentication().getPrincipal();
         Faculty faculty = userDetails.getFaculty();
 
-        if (noAnswerOnly.equals(true)) {
-            return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEqualsAndAnswerNull(faculty.getId(), pageable));
+        searchString = standardizeSearchString(searchString);
+
+        if (BooleanUtils.isTrue(passedToDean)) {
+            return convert(questionRepository.findByFaculty_IdEqualsAndPassedToDeanAndSearchString(searchString, faculty.getId(), pageable));
         }
 
-        return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEquals(faculty.getId(), pageable));
+        if (noAnswerOnly.equals(true)) {
+            return convert(questionRepository.findByFaculty_IdEqualsAndAnswerNullAndSearchString(searchString, faculty.getId(), pageable));
+        }
+
+        return convert(questionRepository.findByFaculty_IdEqualsAndAnswerNotNullAndSearchString(searchString, faculty.getId(), pageable));
+    }
+
+    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @Override
+    public void transferQuestion(QuestionTransferRequest request) {
+
+        Question toBeSavedQuestion = questionRepository.findById(request.getQuestionId())
+                .orElseThrow(() -> new UteForumException("Câu hỏi không tồn tại", HttpStatus.NOT_FOUND));
+
+        toBeSavedQuestion.setTopic(topicRepository.findById(request.getTopicId())
+                .orElseThrow(() -> new UteForumException("Chủ đề không tồn tại", HttpStatus.NOT_FOUND)));
+
+        Optional<Long> optionalAdviserId = userRepository.findAdviserIdForAssigningQuestionByTopicId(toBeSavedQuestion.getTopic().getId());
+        Long adviserId = optionalAdviserId.orElseGet(() -> userRepository.findAdviserIdForAssigningQuestionByFaculty(toBeSavedQuestion.getTopic().getFaculty().getId())
+                .orElseThrow(() -> new UteForumException("Không tìm được tư vấn viên phù hợp", HttpStatus.NOT_FOUND)));
+
+        toBeSavedQuestion.setAdviser(userRepository.findById(adviserId)
+                .orElseThrow(() -> new UteForumException("Không tìm được tư vấn viên phù hợp", HttpStatus.NOT_FOUND)));
+
+        Question savedQuestion = questionRepository.save(toBeSavedQuestion);
+        log.info("Question saved successfully!");
+
+        // send email message to new adviser
+        new Thread(() -> {
+            String message = "<p>" + "Chào " + savedQuestion.getAdviser().getFullName() + "</p>" +
+                    "<p>" + "Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới." + "</p>" +
+                    "<p>" + MessageFormat.format("Mời bạn xem và trả lời tại <a href=\"{0}\">{0}</a>", feQuestionReplierPath + savedQuestion.getId()) + "</p>";
+            emailService.sendHtmlMessage(savedQuestion.getAdviser().getEmail(), "Mời trả lời câu hỏi", message);
+
+        }).start();
+
     }
 
     private void increaseQuestionViews(Question question) {
@@ -228,5 +306,13 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionResponse convert(Question question) {
 
         return modelMapper.map(question, QuestionResponse.class);
+    }
+
+    private String standardizeSearchString(String searchString) {
+        String result;
+        if (ObjectUtils.isEmpty(searchString)) result = "";
+        else result = searchString.toUpperCase();
+
+        return result;
     }
 }

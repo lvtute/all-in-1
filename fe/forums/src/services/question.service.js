@@ -11,6 +11,10 @@ const getById = (questionId) => {
   return http.get(`${API_URL}/${questionId}`);
 };
 
+const getByIdIncludingPrivate = (questionId) => {
+  return http.get(`${API_URL}/find-by-id-including-private/${questionId}`, { headers: authHeader() });
+};
+
 const createQuestion = (requestBody) => {
   return http.post(API_URL, requestBody);
 };
@@ -40,6 +44,13 @@ const getByDean = (params) => {
   };
   return http.get(`${API_URL}/find-by-dean`, config);
 };
+
+const transferQuestion = (requestData) => {
+  return http.put(`${API_URL}/transfer`, requestData, {
+    headers: authHeader(),
+  });
+};
+
 const questionService = {
   getAll,
   getById,
@@ -48,6 +59,8 @@ const questionService = {
   saveAnswer,
   deleteQuestion,
   getByDean,
+  transferQuestion,
+  getByIdIncludingPrivate,
 };
 
 export default questionService;

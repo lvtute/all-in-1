@@ -1,4 +1,11 @@
-import { Button, ListGroup, Modal } from "react-bootstrap";
+import {
+  Button,
+  Form,
+  FormControl,
+  InputGroup,
+  ListGroup,
+  Modal,
+} from "react-bootstrap";
 import { useEffect } from "react";
 import facultyService from "../services/faculty.service";
 import { useState } from "react";
@@ -20,6 +27,9 @@ const Home = () => {
   const [questionList, setQuestionList] = useState([]);
   const [isQuestionLoading, setQuestionLoadingStatus] = useState(true);
 
+  const [searchString, setSearchString] = useState("");
+  const [searchStringState, setSearchStringState] = useState("");
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [size, setSize] = useState(5);
@@ -39,7 +49,6 @@ const Home = () => {
 
   const handleOnQuestionClick = (id) => {
     handleShow();
-    history.push(`${HOME_PATH}/${id}`);
     questionService.getById(id).then((res) => {
       setQuestionDetail(res.data);
       console.log(res.data);
@@ -65,7 +74,7 @@ const Home = () => {
 
   useEffect(() => {
     questionService
-      .getAll({ page: page - 1, size, facultyId })
+      .getAll({ page: page - 1, size, facultyId, searchString: searchStringState })
       .then((res) => {
         console.log(res.data);
         setTotalPages(res.data?.totalPages);
@@ -76,7 +85,7 @@ const Home = () => {
         console.log(err);
         setQuestionLoadingStatus(false);
       });
-  }, [page, size, facultyId]);
+  }, [page, size, facultyId, searchStringState]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -84,6 +93,17 @@ const Home = () => {
 
   const handlePageSizeChange = (event) => {
     setSize(event.target.value);
+  };
+
+  const handleSearchStringChange = (e) => {
+    setSearchString(e.target.value);
+    if (e.target.value === "") setSearchStringState("");
+  };
+
+  const handleSeachButtonClick = () => {
+    setSearchStringState(searchString);
+    setPage(1);
+    setSize(5);
   };
 
   const reloadQuestions = (event) => {
@@ -136,6 +156,24 @@ const Home = () => {
             </Row>
           )}
 
+          <Row>
+            <Form.Row style={{ marginLeft: "auto", float: "right" }}>
+              <Col xs="auto">
+                <InputGroup className="mb-2">
+                  <FormControl
+                    onChange={handleSearchStringChange}
+                    placeholder="Nhập từ khóa "
+                  />
+                </InputGroup>
+              </Col>
+              <Col xs="auto">
+                <Button onClick={handleSeachButtonClick} variant="secondary">
+                  Tìm
+                </Button>
+              </Col>
+            </Form.Row>
+          </Row>
+
           {questionList.map((question) => (
             <Card
               onClick={() => handleOnQuestionClick(question.id)}
@@ -160,15 +198,7 @@ const Home = () => {
                 <Card.Subtitle
                   className="question-subtitle"
                   style={{ float: "right", display: "inline-block" }}
-                >
-                  {!!question.answer ? (
-                    <p style={{ color: "green", fontWeight: "bold" }}>
-                      Đã trả lời
-                    </p>
-                  ) : (
-                    <p style={{ color: "orange" }}>Chờ trả lời</p>
-                  )}
-                </Card.Subtitle>
+                ></Card.Subtitle>
 
                 <Card.Subtitle className="question-subtitle">
                   khoa <span>{question.facultyName}</span>- mục{" "}
@@ -177,6 +207,7 @@ const Home = () => {
               </Card.Body>
             </Card>
           ))}
+
           <Row style={{ float: "right" }} className="mt-3">
             {"size: "}
             <select onChange={handlePageSizeChange} value={size}>

@@ -2,6 +2,7 @@ package com.hcmute.tlcn2021.controller;
 
 import com.hcmute.tlcn2021.payload.request.QuestionCreationRequest;
 import com.hcmute.tlcn2021.payload.request.QuestionReplyRequest;
+import com.hcmute.tlcn2021.payload.request.QuestionTransferRequest;
 import com.hcmute.tlcn2021.payload.response.MessageResponse;
 import com.hcmute.tlcn2021.payload.response.PaginationResponse;
 import com.hcmute.tlcn2021.payload.response.QuestionResponse;
@@ -25,16 +26,18 @@ public class QuestionController {
     private QuestionService questionService;
 
     @GetMapping
-    public ResponseEntity<PaginationResponse> findAll(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                      @RequestParam(required = false) Long facultyId) {
-        return ResponseEntity.ok(questionService.findAll(facultyId, pageable));
+    public ResponseEntity<PaginationResponse> findAll(@PageableDefault(sort = {"createdDate", "lastModifiedDate"}, direction = Sort.Direction.DESC) Pageable pageable,
+                                                      @RequestParam(required = false) Long facultyId,
+                                                      @RequestParam(required = false) String searchString) {
+        return ResponseEntity.ok(questionService.findAll(facultyId, searchString, pageable));
     }
 
     @Secured({"ROLE_ADVISER"})
     @GetMapping("/find-by-adviser-id")
-    public ResponseEntity<PaginationResponse> findAllByAdviserId(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                 @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
-        return ResponseEntity.ok(questionService.findAllByAdviserId(noAnswerOnly, pageable));
+    public ResponseEntity<PaginationResponse> findAllByAdviserId(@PageableDefault(sort = {"createdDate", "lastModifiedDate"}, direction = Sort.Direction.DESC) Pageable pageable,
+                                                                 @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly,
+                                                                 @RequestParam(required = false, defaultValue = "") String searchString) {
+        return ResponseEntity.ok(questionService.findAllByAdviserId(noAnswerOnly, searchString, pageable));
     }
 
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
@@ -47,6 +50,12 @@ public class QuestionController {
     @GetMapping("/{id}")
     public ResponseEntity<QuestionResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(questionService.findById(id));
+    }
+
+    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @GetMapping("/find-by-id-including-private/{id}")
+    public ResponseEntity<QuestionResponse> findByIdIncludingPrivate(@PathVariable Long id) {
+        return ResponseEntity.ok(questionService.findByIdIncludingPrivate(id));
     }
 
     @PostMapping
@@ -64,7 +73,17 @@ public class QuestionController {
     @Secured({"ROLE_DEAN"})
     @GetMapping("/find-by-dean")
     public ResponseEntity<PaginationResponse> findByDean(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                 @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
-        return ResponseEntity.ok(questionService.findAllByDean(noAnswerOnly, pageable));
+                                                         @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly,
+                                                         @RequestParam(required = false, defaultValue = "false") Boolean passedToDean,
+                                                         @RequestParam(required = false, defaultValue = "") String searchString) {
+        return ResponseEntity.ok(questionService.findAllByDean(searchString, noAnswerOnly, passedToDean, pageable));
+    }
+
+    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @PutMapping("/transfer")
+    public ResponseEntity<?> transferQuestion(@RequestBody @Valid QuestionTransferRequest questionTransferRequest) {
+
+        questionService.transferQuestion(questionTransferRequest);
+        return ResponseEntity.ok().build();
     }
 }

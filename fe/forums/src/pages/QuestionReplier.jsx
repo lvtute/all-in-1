@@ -20,6 +20,13 @@ import history from "../history";
 import DraftPasteProcessor from "draft-js/lib/DraftPasteProcessor";
 import { useSelector } from "react-redux";
 
+import DeleteIcon from "@material-ui/icons/Delete";
+import SaveIcon from "@material-ui/icons/Save";
+import FastForwardIcon from "@material-ui/icons/FastForward";
+import facultyService from "../services/faculty.service";
+import topicService from "../services/topic.service";
+import ValidationMessage from "../components/ValidationMessage";
+
 const QuestionReplier = () => {
   const { user } = useSelector((state) => state.auth);
   let role = "";
@@ -34,7 +41,9 @@ const QuestionReplier = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [modalShow, setModalShow] = useState(false);
+  const [modalShow, setModalShow] = useState(false); // deleting modal
+
+  const [transferModalShow, setTransferModalShow] = useState(false);
 
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -44,13 +53,21 @@ const QuestionReplier = () => {
     setEditorState(editorState);
   };
 
+  const [errorResponse, setErrorResponse] = useState(Object);
+  const [facultyList, setFacultyList] = useState([]);
+  const [topicList, setTopicList] = useState([]);
+
+  const [isPrivate, setIsPrivate] = useState(false);
+
   useEffect(() => {
     if (isNaN(id)) {
       return <Page404 />;
     }
     questionService
-      .getById(id)
+      .getByIdIncludingPrivate(id)
       .then((res) => {
+        console.log(res.data.private);
+        setIsPrivate(res.data.private);
         setQuestionDetail(res.data);
         const processedHTML = DraftPasteProcessor.processHTML(
           !!res.data.answer ? res.data.answer : "<p></p>"
@@ -58,11 +75,20 @@ const QuestionReplier = () => {
         const contentState = ContentState.createFromBlockArray(processedHTML);
         let myState = EditorState.createWithContent(contentState);
         let myState2 = EditorState.moveFocusToEnd(myState);
-        setEditorState(myState);
+        // setEditorState(myState);
         setEditorState(myState2);
       })
       .catch((err) => {
         console.log(err.response?.data);
+      });
+
+    facultyService
+      .getAll()
+      .then((res) => {
+        setFacultyList(res.data);
+      })
+      .catch((err) => {
+        console.log(err.res?.data);
       });
   }, [id]);
 
@@ -72,8 +98,9 @@ const QuestionReplier = () => {
     const formData = Object.fromEntries(new FormData(event.target).entries());
     let data = {
       questionId: id,
-      consultDean: formData.consultDean === "on" ? "true" : false,
+      consultDean: formData.consultDean === "on",
       answer: stateToHTML(editorState.getCurrentContent()),
+      isPrivate: formData.isPrivate === "on",
     };
     console.log(data);
     questionService
@@ -110,6 +137,53 @@ const QuestionReplier = () => {
       });
   };
 
+  const handleTransferModalShow = () => {
+    setTransferModalShow(true);
+  };
+
+  const handleTransferModalClose = () => {
+    setTransferModalShow(false);
+  };
+
+  const handleTransfer = (event) => {
+    event.preventDefault();
+    const formData = Object.fromEntries(new FormData(event.target).entries());
+    let requestBody = {
+      questionId: id,
+      facultyId: isNaN(formData.facultyId) ? "" : formData.facultyId,
+      topicId: isNaN(formData.topicId) ? "" : formData.topicId,
+    };
+
+    questionService
+      .transferQuestion(requestBody)
+      .then((res) => {
+        toast.success("Chuyển câu hỏi thành công", TOASTIFY_CONFIGS);
+        setTransferModalShow(false);
+        history.push(`${dashboard}/question`);
+      })
+      .catch((err) => {
+        toast.error("Xảy ra lỗi", TOASTIFY_CONFIGS);
+        console.log(err.response?.data);
+        setErrorResponse(err.response?.data);
+      });
+  };
+
+  const onFacultySelectorChange = (event) => {
+    if (isNaN(event.target.value)) {
+      setTopicList([]);
+    } else {
+      topicService
+        .getByFacultyId(event.target.value)
+        .then((res) => {
+          setTopicList(res.data);
+        })
+        .catch((err) => {
+          setTopicList([]);
+          console.log(err);
+        });
+    }
+  };
+
   return (
     <>
       <CenteredTitle title="TRẢ LỜI CÂU HỎI" />
@@ -131,7 +205,6 @@ const QuestionReplier = () => {
               style={{ marginBottom: "0", color: "#6c757d" }}
             >{`Khoa ${questionDetail.facultyName} | ${questionDetail.topicName}`}</p>
           </Row>
-
           <Row>
             <div
               dangerouslySetInnerHTML={createMarkup(questionDetail.content)}
@@ -185,9 +258,18 @@ const QuestionReplier = () => {
               </p>
             )}
           </Row>
-          <Button variant="outline-danger" onClick={handleModalShow}>
-            Xóa câu hỏi này
+
+          <Button
+            style={{ marginRight: "3%" }}
+            variant="outline-danger"
+            onClick={handleModalShow}
+          >
+            <DeleteIcon></DeleteIcon>Xóa câu hỏi này
           </Button>
+          <Button variant="outline-success" onClick={handleTransferModalShow}>
+            <FastForwardIcon></FastForwardIcon>Chuyển câu hỏi cho mục khác
+          </Button>
+
           <Modal size="sm" show={modalShow} centered onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>Xóa câu hỏi?</Modal.Title>
@@ -196,6 +278,75 @@ const QuestionReplier = () => {
             <Modal.Footer>
               <Button variant="danger" onClick={handleDelete}>
                 Xóa
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal
+            size="md"
+            show={transferModalShow}
+            centered
+            onHide={handleTransferModalClose}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Chuyển câu hỏi</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+              <Form id="question-transfer-form" onSubmit={handleTransfer}>
+                <Form.Group controlId="exampleForm.SelectCustom">
+                  <Form.Label>Chọn khoa</Form.Label>
+                  <Form.Control
+                    as="select"
+                    custom
+                    name="facultyId"
+                    onChange={(e) => {
+                      onFacultySelectorChange(e);
+                    }}
+                  >
+                    <option>Chọn khoa</option>
+                    {facultyList.map((f) => {
+                      return (
+                        <option key={f.id} value={f.id}>
+                          {f.name}
+                        </option>
+                      );
+                    })}
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group controlId="exampleForm.SelectCustom">
+                  <Form.Label>Chọn chủ đề</Form.Label>
+                  <Form.Control as="select" custom name="topicId">
+                    <option>Chọn chủ đề</option>
+                    {topicList.map((t) => {
+                      return (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      );
+                    })}
+                  </Form.Control>
+                  <ValidationMessage
+                    errorResponse={errorResponse}
+                    field="topicId"
+                  />
+                  <ValidationMessage
+                    errorResponse={errorResponse}
+                    field="error"
+                  />
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button
+                variant="success"
+                type="submit"
+                form="question-transfer-form"
+              >
+                <span>
+                  Chuyển <FastForwardIcon></FastForwardIcon>
+                </span>
               </Button>
             </Modal.Footer>
           </Modal>
@@ -214,13 +365,20 @@ const QuestionReplier = () => {
               toolbarClassName="toolbar-class"
             />
           </Form.Row>
-
           {role === ROLE_ADVISER && (
-            <Form.Check
-              name="consultDean"
-              type="checkbox"
-              label="Gửi mail cho Trưởng khoa để xác nhận câu trả lời"
-            />
+            <>
+              <Form.Check
+                name="consultDean"
+                type="checkbox"
+                label="Xin xác nhận từ Trưởng ban Tư vấn"
+              />
+              <Form.Check
+                defaultChecked= {isPrivate}
+                name="isPrivate"
+                type="checkbox"
+                label="Đánh dấu câu hỏi là RIÊNG TƯ"
+              />
+            </>
           )}
         </Form.Group>
         <Button disabled={isSubmitting} variant="primary" type="submit">
@@ -233,7 +391,7 @@ const QuestionReplier = () => {
               aria-hidden="true"
             />
           )}
-          Lưu
+          <SaveIcon></SaveIcon>Lưu
         </Button>
       </Form>
     </>

@@ -83,3 +83,8 @@ button.list-group-item.list-group-item-info.list-group-item-action {
   border: none;
   border-radius: 25px;
 }
+
+.MuiTab-textColorPrimary.Mui-selected {
+  background: #e8eaf6;
+  font-weight: bold;
+}

@@ -7,14 +7,10 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class QuestionReplyRequest {
-
-    @NotNull
+public class QuestionTransferRequest {
+    @NotNull(message = "Vui lòng cung cấp id câu hỏi")
     private Long questionId;
 
-    private boolean consultDean;
-    private Boolean isPrivate;
-
-    private String answer;
-
+    @NotNull(message = "Vui lòng chọn chủ đề")
+    private Long topicId;
 }

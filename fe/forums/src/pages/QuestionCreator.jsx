@@ -65,8 +65,8 @@ const QuestionCreator = () => {
     let requestBody = {
       ...formData,
       content: stateToHTML(editorState.getCurrentContent()),
-      agreeToReceiveEmailNotification:
-        !!formData.agreeToReceiveEmailNotification ? "true" : "false",
+      // agreeToReceiveEmailNotification:
+      //   !!formData.agreeToReceiveEmailNotification ? "true" : "false",
       facultyId: isNaN(formData.facultyId) ? "" : formData.facultyId,
       topicId: isNaN(formData.topicId) ? "" : formData.topicId,
     };
@@ -162,11 +162,11 @@ const QuestionCreator = () => {
             />
           </Form.Row>
 
-          <Form.Check
+          {/* <Form.Check
             name="agreeToReceiveEmailNotification"
             type="checkbox"
             label="Đăng ký nhận email thông báo"
-          />
+          /> */}
         </Form.Group>
         <ValidationMessage errorResponse={errorResponse} field="error" />
         <Button disabled={isSubmitting} variant="primary" type="submit">

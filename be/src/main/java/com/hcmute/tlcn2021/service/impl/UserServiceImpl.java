@@ -126,14 +126,15 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         // send email
-        StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("Xin chào ").append(savedUser.getFullName()).append("\n");
-        messageBuilder.append("Tài khoản của bạn đã được tạo thành công!\n");
-        messageBuilder.append("Tài khoản: ").append(savedUser.getUsername()).append("\n");
-        messageBuilder.append("Mật khẩu: ").append(password).append("\n");
-        messageBuilder.append("Xin mời đăng nhập tại ").append(loginPath).append(" và đổi mật khẩu").append("\n");
+        new Thread(() -> {
+            String messageBuilder = "Xin chào " + savedUser.getFullName() + "\n" +
+                    "Tài khoản của bạn đã được tạo thành công!\n" +
+                    "Tài khoản: " + savedUser.getUsername() + "\n" +
+                    "Mật khẩu: " + password + "\n" +
+                    "Xin mời đăng nhập tại " + loginPath + " và đổi mật khẩu" + "\n";
+            emailService.sendSimpleMessage(savedUser.getEmail(), "Tạo tài khoản thành công", messageBuilder);
+        }).start();
 
-        emailService.sendSimpleMessage(savedUser.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Tạo tài khoản thành công", messageBuilder.toString());
 
         return new MessageResponse(String.format("User %s registered successfully!",
                 savedUser.getUsername()));
@@ -265,15 +266,14 @@ public class UserServiceImpl implements UserService {
         log.info("User created successfully, username = " + saved.getUsername());
 
         // send email
-        StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("Xin chào ").append(saved.getFullName()).append("\n");
-        messageBuilder.append("Tài khoản của bạn đã được tạo thành công!\n");
-        messageBuilder.append("Tài khoản: ").append(request.getUsername()).append("\n");
-        messageBuilder.append("Mật khẩu: ").append(password).append("\n");
-        messageBuilder.append("Xin mời đăng nhập tại ").append(loginPath).append(" và đổi mật khẩu").append("\n");
-
-        emailService.sendSimpleMessage(saved.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Tạo tài khoản thành công", messageBuilder.toString());
-
+        new Thread(() -> {
+            String messageBuilder = "Xin chào " + saved.getFullName() + "\n" +
+                    "Tài khoản của bạn đã được tạo thành công!\n" +
+                    "Tài khoản: " + request.getUsername() + "\n" +
+                    "Mật khẩu: " + password + "\n" +
+                    "Xin mời đăng nhập tại " + loginPath + " và đổi mật khẩu" + "\n";
+            emailService.sendSimpleMessage(saved.getEmail(), "Tạo tài khoản thành công", messageBuilder);
+        }).start();
     }
 
     private SingleUserDetailsResponse convertSingleUser(User user) {

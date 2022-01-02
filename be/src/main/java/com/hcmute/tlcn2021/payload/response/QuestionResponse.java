@@ -36,4 +36,6 @@ public class QuestionResponse {
     private String adviserFullName;
 
     private boolean approvedByDean;
+
+    private boolean isPrivate;
 }
