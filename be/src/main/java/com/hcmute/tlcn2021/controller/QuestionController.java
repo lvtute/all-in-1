@@ -52,6 +52,12 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.findById(id));
     }
 
+    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @GetMapping("/find-by-id-including-private/{id}")
+    public ResponseEntity<QuestionResponse> findByIdIncludingPrivate(@PathVariable Long id) {
+        return ResponseEntity.ok(questionService.findByIdIncludingPrivate(id));
+    }
+
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody @Valid QuestionCreationRequest request) {
         return ResponseEntity.ok(questionService.create(request));

@@ -6,6 +6,7 @@ import com.hcmute.tlcn2021.enumeration.ERole;
 import com.hcmute.tlcn2021.exception.UteForumException;
 import com.hcmute.tlcn2021.model.Faculty;
 import com.hcmute.tlcn2021.model.Question;
+import com.hcmute.tlcn2021.model.User;
 import com.hcmute.tlcn2021.payload.request.QuestionCreationRequest;
 import com.hcmute.tlcn2021.payload.request.QuestionReplyRequest;
 import com.hcmute.tlcn2021.payload.request.QuestionTransferRequest;
@@ -30,6 +31,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -102,19 +104,35 @@ public class QuestionServiceImpl implements QuestionService {
         log.info("Question saved successfully!");
 
         // send email to notify assigned adviser
-        StringBuilder message = new StringBuilder();
-        message.append("Chào ").append(savedQuestion.getAdviser().getFullName()).append(",\n");
-        message.append("Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới.").append("\n");
-        message.append("Mời bạn xem và trả lời tại địa chỉ ").append(feQuestionReplierPath).append(savedQuestion.getId()).append("\n");
-        emailService.sendSimpleMessage(savedQuestion.getAdviser().getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Mời trả lời câu hỏi", message.toString());
+        Runnable sendEmail = () -> {
+            String message = "<p>" + "Chào " + savedQuestion.getAdviser().getFullName() + "</p>" +
+                    "<p>" + "Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới." + "</p>" +
+                    "<p>" + MessageFormat.format("Mời bạn xem và trả lời tại <a href=\"{0}\">{0}</a>", feQuestionReplierPath + savedQuestion.getId()) + "</p>";
+            emailService.sendHtmlMessage(savedQuestion.getAdviser().getEmail(), "Mời trả lời câu hỏi", message);
+
+        };
+        new Thread(sendEmail).start();
 
         return savedQuestion.getId();
 
     }
 
+    @Secured({"ROLE_DEAN", "ROLE_ADVISER"})
+    @Override
+    public QuestionResponse findByIdIncludingPrivate(Long id) {
+
+        Question foundQuestion = questionRepository.findById(id).orElseThrow(() -> new UteForumException("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND));
+
+        increaseQuestionViews(foundQuestion);
+        return convert(foundQuestion);
+    }
+
+
     @Override
     public QuestionResponse findById(Long id) {
-        Question foundQuestion = questionRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new UteForumException("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND));
+
+        Question foundQuestion = questionRepository.findByIdAndIsPrivateFalse(id).orElseThrow(() -> new UteForumException("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND));
+
         increaseQuestionViews(foundQuestion);
         return convert(foundQuestion);
     }
@@ -160,32 +178,40 @@ public class QuestionServiceImpl implements QuestionService {
         }
         question.setPrivate(BooleanUtils.isTrue(questionReplyRequest.getIsPrivate()));
 
-        QuestionResponse result = convert(questionRepository.save(question));
+        Question saved = questionRepository.save(question);
+        QuestionResponse result = convert(saved);
 
-        // send email to the question creator
-//        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
-//            StringBuilder message = new StringBuilder();
-//            message.append("Chào ").append(question.getName()).append(",\n");
-//            message.append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời.\n");
-//            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionHomeDetailPath).append(question.getId());
-//            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã được trả lời", message.toString());
-//        }
+//      send email to the question creator
 
-        // send email to dean for approval
-//        if (questionReplyRequest.isConsultDean()) {
-//
-//            User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
-//                    .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
-//            if (ObjectUtils.isEmpty(dean.getEmail())) {
-//                throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
-//            }
-//
-//            StringBuilder message = new StringBuilder();
-//            message.append("Chào ").append(dean.getFullName()).append(",\n");
-//            message.append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("\n");
-//            message.append("Mời bạn xem tại địa chỉ ").append(feQuestionReplierPath).append(question.getId()).append("\n");
-//            emailService.sendSimpleMessage(dean.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Thư xin phê duyệt câu trả lời", message.toString());
-//        }
+        new Thread(() -> {
+            StringBuilder message = new StringBuilder();
+            message.append("<p>").append("Chào ").append(question.getName()).append("</p>");
+            message.append("<p>").append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời bởi ").append(result.getAdviserFullName()).append("</p>");
+            message.append("<p>").append(result.getAnswer()).append("</p>");
+            if (!saved.isPrivate()) {
+                message.append("<p>").append(MessageFormat.format("Mời bạn xem tại địa chỉ <a href=\"{0}\">{0}</a>", feQuestionHomeDetailPath + question.getId())).append("</p>");
+            } else {
+                message.append("<p>").append("Tư vấn viên đã đánh dấu câu hỏi này là riêng tư. Vì vậy bạn chỉ mình bạn mới có thể xem câu trả lời tại đây, và câu hỏi sẽ không xuất hiện trên web tư vấn.").append("</p>");
+            }
+            emailService.sendHtmlMessage(question.getEmail(), "Câu hỏi của bạn đã được trả lời", message.toString());
+
+            // send email to dean for approval
+            if (questionReplyRequest.isConsultDean()) {
+
+                User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
+                        .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
+                if (ObjectUtils.isEmpty(dean.getEmail())) {
+                    throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
+                }
+
+                message = new StringBuilder();
+                message.append("<p>").append("Chào ").append(dean.getFullName()).append("</p>");
+                message.append("<p>").append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("</p>");
+                message.append("<p>").append(MessageFormat.format("Mời bạn xem tại địa chỉ <a href=\"{0}\">{0}</a>", feQuestionReplierPath + question.getId())).append("</p>");
+                emailService.sendHtmlMessage(dean.getEmail(), "Thư xin phê duyệt câu trả lời", message.toString());
+            }
+        }).start();
+
 
         return result;
     }
@@ -207,11 +233,12 @@ public class QuestionServiceImpl implements QuestionService {
 
         questionRepository.deleteById(questionId);
 
-//        if (ObjectUtils.isNotEmpty(question.getAgreeToReceiveEmailNotification()) && question.getAgreeToReceiveEmailNotification().equals(Boolean.TRUE)) {
-//            // send email notification about question is deleted
-//            String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
-//            emailService.sendSimpleMessage(question.getEmail(), EmailService.EMAIL_SUBJECT_PREFIX + "Câu hỏi đã bị xóa", message);
-//        }
+        // send email notification about question is deleted
+        new Thread(() -> {
+            String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
+            emailService.sendSimpleMessage(question.getEmail(), "Câu hỏi đã bị xóa", message);
+        }).start();
+
     }
 
     @Secured({"ROLE_DEAN"})
@@ -253,7 +280,15 @@ public class QuestionServiceImpl implements QuestionService {
         Question savedQuestion = questionRepository.save(toBeSavedQuestion);
         log.info("Question saved successfully!");
 
-        // TODO send email to new adviser
+        // send email message to new adviser
+        new Thread(() -> {
+            String message = "<p>" + "Chào " + savedQuestion.getAdviser().getFullName() + "</p>" +
+                    "<p>" + "Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới." + "</p>" +
+                    "<p>" + MessageFormat.format("Mời bạn xem và trả lời tại <a href=\"{0}\">{0}</a>", feQuestionReplierPath + savedQuestion.getId()) + "</p>";
+            emailService.sendHtmlMessage(savedQuestion.getAdviser().getEmail(), "Mời trả lời câu hỏi", message);
+
+        }).start();
+
     }
 
     private void increaseQuestionViews(Question question) {

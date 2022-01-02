@@ -57,13 +57,17 @@ const QuestionReplier = () => {
   const [facultyList, setFacultyList] = useState([]);
   const [topicList, setTopicList] = useState([]);
 
+  const [isPrivate, setIsPrivate] = useState(false);
+
   useEffect(() => {
     if (isNaN(id)) {
       return <Page404 />;
     }
     questionService
-      .getById(id)
+      .getByIdIncludingPrivate(id)
       .then((res) => {
+        console.log(res.data.private);
+        setIsPrivate(res.data.private);
         setQuestionDetail(res.data);
         const processedHTML = DraftPasteProcessor.processHTML(
           !!res.data.answer ? res.data.answer : "<p></p>"
@@ -71,7 +75,7 @@ const QuestionReplier = () => {
         const contentState = ContentState.createFromBlockArray(processedHTML);
         let myState = EditorState.createWithContent(contentState);
         let myState2 = EditorState.moveFocusToEnd(myState);
-        setEditorState(myState);
+        // setEditorState(myState);
         setEditorState(myState2);
       })
       .catch((err) => {
@@ -361,7 +365,6 @@ const QuestionReplier = () => {
               toolbarClassName="toolbar-class"
             />
           </Form.Row>
-
           {role === ROLE_ADVISER && (
             <>
               <Form.Check
@@ -370,6 +373,7 @@ const QuestionReplier = () => {
                 label="Xin xác nhận từ Trưởng ban Tư vấn"
               />
               <Form.Check
+                defaultChecked= {isPrivate}
                 name="isPrivate"
                 type="checkbox"
                 label="Đánh dấu câu hỏi là RIÊNG TƯ"

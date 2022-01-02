@@ -23,7 +23,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     String CHECK_QUESTION_IS_NOT_ANSWERED = " AND q.answer IS NULL ";
     String CHECK_ADVISER_ID_CONDITION = " AND q.adviser.id = :adviserId ";
 
-    Optional<Question> findByIdAndIsDeletedFalse(Long id);
+    Optional<Question> findByIdAndIsPrivateFalse(Long id);
 
     @Modifying
     @Query("UPDATE Question q SET q.isDeleted = true WHERE q.id = :id AND q.isDeleted = false")

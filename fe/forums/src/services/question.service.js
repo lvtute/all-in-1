@@ -11,6 +11,10 @@ const getById = (questionId) => {
   return http.get(`${API_URL}/${questionId}`);
 };
 
+const getByIdIncludingPrivate = (questionId) => {
+  return http.get(`${API_URL}/find-by-id-including-private/${questionId}`, { headers: authHeader() });
+};
+
 const createQuestion = (requestBody) => {
   return http.post(API_URL, requestBody);
 };
@@ -56,6 +60,7 @@ const questionService = {
   deleteQuestion,
   getByDean,
   transferQuestion,
+  getByIdIncludingPrivate,
 };
 
 export default questionService;
