@@ -67,8 +67,10 @@ public class QuestionController {
     @Secured({"ROLE_DEAN"})
     @GetMapping("/find-by-dean")
     public ResponseEntity<PaginationResponse> findByDean(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                         @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly) {
-        return ResponseEntity.ok(questionService.findAllByDean(noAnswerOnly, pageable));
+                                                         @RequestParam(required = false, defaultValue = "false") Boolean noAnswerOnly,
+                                                         @RequestParam(required = false, defaultValue = "false") Boolean passedToDean,
+                                                         @RequestParam(required = false, defaultValue = "") String searchString) {
+        return ResponseEntity.ok(questionService.findAllByDean(searchString, noAnswerOnly, passedToDean, pageable));
     }
 
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})

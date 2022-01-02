@@ -18,6 +18,7 @@ import com.hcmute.tlcn2021.repository.UserRepository;
 import com.hcmute.tlcn2021.service.EmailService;
 import com.hcmute.tlcn2021.service.QuestionService;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,6 +158,8 @@ public class QuestionServiceImpl implements QuestionService {
             question.setApprovedByDean(false);
             question.setStatus(QuestionStatus.PASSED_TO_DEAN);
         }
+        question.setPrivate(BooleanUtils.isTrue(questionReplyRequest.getIsPrivate()));
+
         QuestionResponse result = convert(questionRepository.save(question));
 
         // send email to the question creator
@@ -213,15 +216,21 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Secured({"ROLE_DEAN"})
     @Override
-    public PaginationResponse findAllByDean(Boolean noAnswerOnly, Pageable pageable) {
+    public PaginationResponse findAllByDean(String searchString, Boolean noAnswerOnly, Boolean passedToDean, Pageable pageable) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authenticationFacade.getAuthentication().getPrincipal();
         Faculty faculty = userDetails.getFaculty();
 
-        if (noAnswerOnly.equals(true)) {
-            return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEqualsAndAnswerNull(faculty.getId(), pageable));
+        searchString = standardizeSearchString(searchString);
+
+        if (BooleanUtils.isTrue(passedToDean)) {
+            return convert(questionRepository.findByFaculty_IdEqualsAndPassedToDeanAndSearchString(searchString, faculty.getId(), pageable));
         }
 
-        return convert(questionRepository.findAllByIsDeletedFalseAndFaculty_IdEquals(faculty.getId(), pageable));
+        if (noAnswerOnly.equals(true)) {
+            return convert(questionRepository.findByFaculty_IdEqualsAndAnswerNullAndSearchString(searchString, faculty.getId(), pageable));
+        }
+
+        return convert(questionRepository.findByFaculty_IdEqualsAndAnswerNotNullAndSearchString(searchString, faculty.getId(), pageable));
     }
 
     @Secured({"ROLE_DEAN", "ROLE_ADVISER"})

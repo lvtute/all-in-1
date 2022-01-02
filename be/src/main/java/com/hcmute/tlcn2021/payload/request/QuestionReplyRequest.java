@@ -13,5 +13,8 @@ public class QuestionReplyRequest {
     private Long questionId;
 
     private boolean consultDean;
+    private Boolean isPrivate;
+
     private String answer;
+
 }

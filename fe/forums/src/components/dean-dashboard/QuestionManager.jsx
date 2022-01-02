@@ -1,4 +1,14 @@
-import { Card, Container, Form, Row, Spinner } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  FormControl,
+  InputGroup,
+  Row,
+  Spinner,
+} from "react-bootstrap";
 import { useState, useEffect } from "react";
 import questionService from "../../services/question.service";
 import Pagination from "@material-ui/lab/Pagination";
@@ -6,6 +16,15 @@ import ValidationMessage from "../ValidationMessage";
 import { QUESTION_REPLIER } from "../../services/constants";
 import history from "../../history";
 import { useSelector } from "react-redux";
+
+import { makeStyles } from "@material-ui/core/styles";
+import Paper from "@material-ui/core/Paper";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+
+import ContactSupportOutlinedIcon from "@material-ui/icons/ContactSupportOutlined";
+import CheckCircleOutlineRoundedIcon from "@material-ui/icons/CheckCircleOutlineRounded";
+import HourglassEmptyOutlinedIcon from "@material-ui/icons/HourglassEmptyOutlined";
 
 const QuestionManager = () => {
   const [questionList, setQuestionList] = useState([]);
@@ -15,6 +34,10 @@ const QuestionManager = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [size, setSize] = useState(5);
   const [noAnswerOnly, setNoAnswerOnly] = useState(false);
+  const [passedToDean, setPassedToDean] = useState(true);
+
+  const [searchString, setSearchString] = useState("");
+  const [searchStringState, setSearchStringState] = useState("");
 
   const sizes = [5, 10];
 
@@ -24,7 +47,13 @@ const QuestionManager = () => {
   useEffect(() => {
     let isMounted = true;
     questionService
-      .getByDean({ page: page - 1, size, noAnswerOnly })
+      .getByDean({
+        page: page - 1,
+        size,
+        noAnswerOnly,
+        passedToDean,
+        searchString: searchStringState,
+      })
       .then((res) => {
         if (isMounted) {
           setTotalPages(res.data?.totalPages);
@@ -42,7 +71,7 @@ const QuestionManager = () => {
     return () => {
       isMounted = false;
     };
-  }, [page, size, noAnswerOnly]);
+  }, [page, size, noAnswerOnly, passedToDean, searchStringState]);
 
   const handlePageChange = (event, value) => {
     // if (isMounted) {
@@ -60,8 +89,24 @@ const QuestionManager = () => {
     history.push(`${QUESTION_REPLIER}/${id}`);
   };
 
-  const handleAnswerOnlyCheckboxChange = (e) => {
-    setNoAnswerOnly(e.target.checked);
+  // tabs
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+    setSearchString("");
+    setPassedToDean(newValue === 0);
+    setNoAnswerOnly(newValue === 1);
+  };
+
+  const handleSearchStringChange = (e) => {
+    setSearchString(e.target.value);
+    if (e.target.value === "") setSearchStringState("");
+  };
+  const handleSeachButtonClick = () => {
+    setSearchStringState(searchString);
+    setPage(1);
+    setSize(5);
   };
 
   return (
@@ -69,6 +114,24 @@ const QuestionManager = () => {
       <h4>{`Câu hỏi trong khoa ${faculty.name}`}</h4>
 
       <Container>
+        <Row>
+          <Form.Row style={{ marginLeft: "auto", float: "right" }}>
+            <Col xs="auto">
+              <InputGroup className="mb-2">
+                <FormControl
+                  defaultValue={searchString}
+                  onChange={handleSearchStringChange}
+                  placeholder="Nhập từ khóa"
+                />
+              </InputGroup>
+            </Col>
+            <Col xs="auto">
+              <Button onClick={handleSeachButtonClick} variant="secondary">
+                Tìm
+              </Button>
+            </Col>
+          </Form.Row>
+        </Row>
         {isQuestionLoading && (
           <Row style={{ display: "flex", height: "80%" }}>
             <Spinner
@@ -83,12 +146,10 @@ const QuestionManager = () => {
         )}
 
         <Row>
-          <Form.Check
-            disabled={isQuestionLoading}
-            type="checkbox"
-            label="Chỉ hiện câu chưa trả lời"
-            onChange={handleAnswerOnlyCheckboxChange}
-          />
+          <CenteredTabs
+            handleTabChange={handleTabChange}
+            tabValue={tabValue}
+          ></CenteredTabs>
           {questionList.map((question) => (
             <Card
               key={question.id}
@@ -135,4 +196,46 @@ const QuestionManager = () => {
     </>
   );
 };
+
+const useStyles = makeStyles({
+  root: {
+    flexGrow: 1,
+  },
+});
+
+const CenteredTabs = ({ handleTabChange, tabValue }) => {
+  const classes = useStyles();
+
+  const myTabStyle = { fontSize: "1.1em" };
+  return (
+    <Paper className={classes.root}>
+      <Tabs
+        value={tabValue}
+        onChange={handleTabChange}
+        indicatorColor="primary"
+        textColor="primary"
+        centered
+        variant="fullWidth"
+      >
+        <Tab
+          style={{ ...myTabStyle, color: "#0288d1" }}
+          label="Chờ xác nhận"
+          icon={<HourglassEmptyOutlinedIcon />}
+        />
+        <Tab
+          style={{ ...myTabStyle, color: "#ffa000" }}
+          label="Chưa trả lời"
+          icon={<ContactSupportOutlinedIcon />}
+        />
+        <Tab
+          style={{ ...myTabStyle, color: "#80cbc4" }}
+          label="Đã trả lời"
+          icon={<CheckCircleOutlineRoundedIcon />}
+        />
+        CheckCircleOutlineRoundedIcon
+      </Tabs>
+    </Paper>
+  );
+};
+
 export default QuestionManager;

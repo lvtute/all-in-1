@@ -20,7 +20,7 @@ public interface QuestionService {
 
     void delete(Long questionId);
 
-    PaginationResponse findAllByDean(Boolean noAnswerOnly, Pageable pageable);
+    PaginationResponse findAllByDean(String searchString, Boolean noAnswerOnly, Boolean passedToDean, Pageable pageable);
 
     void transferQuestion(QuestionTransferRequest questionTransferRequest);
 }

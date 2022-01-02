@@ -162,7 +162,7 @@ const Home = () => {
                 <InputGroup className="mb-2">
                   <FormControl
                     onChange={handleSearchStringChange}
-                    placeholder="Tìm kiếm"
+                    placeholder="Nhập từ khóa "
                   />
                 </InputGroup>
               </Col>

@@ -94,8 +94,9 @@ const QuestionReplier = () => {
     const formData = Object.fromEntries(new FormData(event.target).entries());
     let data = {
       questionId: id,
-      consultDean: formData.consultDean === "on" ? "true" : false,
+      consultDean: formData.consultDean === "on",
       answer: stateToHTML(editorState.getCurrentContent()),
+      isPrivate: formData.isPrivate === "on",
     };
     console.log(data);
     questionService
@@ -153,15 +154,13 @@ const QuestionReplier = () => {
       .transferQuestion(requestBody)
       .then((res) => {
         toast.success("Chuyển câu hỏi thành công", TOASTIFY_CONFIGS);
+        setTransferModalShow(false);
         history.push(`${dashboard}/question`);
-    setTransferModalShow(false);
-
       })
       .catch((err) => {
         toast.error("Xảy ra lỗi", TOASTIFY_CONFIGS);
         console.log(err.response?.data);
         setErrorResponse(err.response?.data);
-
       });
   };
 
@@ -327,7 +326,7 @@ const QuestionReplier = () => {
                     errorResponse={errorResponse}
                     field="topicId"
                   />
-                    <ValidationMessage
+                  <ValidationMessage
                     errorResponse={errorResponse}
                     field="error"
                   />
@@ -364,11 +363,18 @@ const QuestionReplier = () => {
           </Form.Row>
 
           {role === ROLE_ADVISER && (
-            <Form.Check
-              name="consultDean"
-              type="checkbox"
-              label="Xin xác nhận từ Trưởng ban Tư vấn"
-            />
+            <>
+              <Form.Check
+                name="consultDean"
+                type="checkbox"
+                label="Xin xác nhận từ Trưởng ban Tư vấn"
+              />
+              <Form.Check
+                name="isPrivate"
+                type="checkbox"
+                label="Đánh dấu câu hỏi là RIÊNG TƯ"
+              />
+            </>
           )}
         </Form.Group>
         <Button disabled={isSubmitting} variant="primary" type="submit">
