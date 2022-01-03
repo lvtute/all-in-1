@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,6 +77,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${fe.path.login}")
     private String loginPath;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Override
     public JwtResponse signIn(LoginRequest loginRequest) {
@@ -126,15 +130,14 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         // send email
-        new Thread(() -> {
+        executorService.execute(() -> {
             String messageBuilder = "Xin chào " + savedUser.getFullName() + "\n" +
                     "Tài khoản của bạn đã được tạo thành công!\n" +
                     "Tài khoản: " + savedUser.getUsername() + "\n" +
                     "Mật khẩu: " + password + "\n" +
                     "Xin mời đăng nhập tại " + loginPath + " và đổi mật khẩu" + "\n";
             emailService.sendSimpleMessage(savedUser.getEmail(), "Tạo tài khoản thành công", messageBuilder);
-        }).start();
-
+        });
 
         return new MessageResponse(String.format("User %s registered successfully!",
                 savedUser.getUsername()));
@@ -266,14 +269,14 @@ public class UserServiceImpl implements UserService {
         log.info("User created successfully, username = " + saved.getUsername());
 
         // send email
-        new Thread(() -> {
+        executorService.execute(() -> {
             String messageBuilder = "Xin chào " + saved.getFullName() + "\n" +
                     "Tài khoản của bạn đã được tạo thành công!\n" +
                     "Tài khoản: " + request.getUsername() + "\n" +
                     "Mật khẩu: " + password + "\n" +
                     "Xin mời đăng nhập tại " + loginPath + " và đổi mật khẩu" + "\n";
             emailService.sendSimpleMessage(saved.getEmail(), "Tạo tài khoản thành công", messageBuilder);
-        }).start();
+        });
     }
 
     private SingleUserDetailsResponse convertSingleUser(User user) {
