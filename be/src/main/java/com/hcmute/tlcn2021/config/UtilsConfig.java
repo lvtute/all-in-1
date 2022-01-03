@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class UtilsConfig {
@@ -28,5 +30,10 @@ public class UtilsConfig {
     @Bean
     public RandomStringGenerator passwordGenerator() {
         return new RandomStringGenerator.Builder().withinRange('0', 'z').build();
+    }
+
+    @Bean
+    public ExecutorService getExecuterService() {
+        return Executors.newFixedThreadPool(10);
     }
 }

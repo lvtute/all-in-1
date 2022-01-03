@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import com.hcmute.tlcn2021.enumeration.QuestionStatus;
@@ -67,6 +68,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Value("${fe.path.question.replier}")
     private String feQuestionReplierPath;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Override
     public PaginationResponse findAll(Long facultyId, String searchString, Pageable pageable) {
@@ -111,7 +115,7 @@ public class QuestionServiceImpl implements QuestionService {
             emailService.sendHtmlMessage(savedQuestion.getAdviser().getEmail(), "Mời trả lời câu hỏi", message);
 
         };
-        new Thread(sendEmail).start();
+        executorService.execute(sendEmail);
 
         return savedQuestion.getId();
 
@@ -183,7 +187,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 //      send email to the question creator
 
-        new Thread(() -> {
+        executorService.execute(() -> {
             StringBuilder message = new StringBuilder();
             message.append("<p>").append("Chào ").append(question.getName()).append("</p>");
             message.append("<p>").append("Câu hỏi của bạn với tiêu đề: ").append(question.getTitle()).append(" đã được trả lời bởi ").append(result.getAdviserFullName()).append("</p>");
@@ -210,7 +214,7 @@ public class QuestionServiceImpl implements QuestionService {
                 message.append("<p>").append(MessageFormat.format("Mời bạn xem tại địa chỉ <a href=\"{0}\">{0}</a>", feQuestionReplierPath + question.getId())).append("</p>");
                 emailService.sendHtmlMessage(dean.getEmail(), "Thư xin phê duyệt câu trả lời", message.toString());
             }
-        }).start();
+        });
 
 
         return result;
@@ -234,10 +238,10 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.deleteById(questionId);
 
         // send email notification about question is deleted
-        new Thread(() -> {
+       executorService.execute(() -> {
             String message = "Câu hỏi của bạn với tiêu đề:\n" + question.getTitle() + "\n đã bị xóa.";
             emailService.sendSimpleMessage(question.getEmail(), "Câu hỏi đã bị xóa", message);
-        }).start();
+        });
 
     }
 
@@ -281,13 +285,13 @@ public class QuestionServiceImpl implements QuestionService {
         log.info("Question saved successfully!");
 
         // send email message to new adviser
-        new Thread(() -> {
+        executorService.execute(() -> {
             String message = "<p>" + "Chào " + savedQuestion.getAdviser().getFullName() + "</p>" +
                     "<p>" + "Với vai trò Tư vấn viên, bạn được giao 1 câu hỏi mới." + "</p>" +
                     "<p>" + MessageFormat.format("Mời bạn xem và trả lời tại <a href=\"{0}\">{0}</a>", feQuestionReplierPath + savedQuestion.getId()) + "</p>";
             emailService.sendHtmlMessage(savedQuestion.getAdviser().getEmail(), "Mời trả lời câu hỏi", message);
 
-        }).start();
+        });
 
     }
 
