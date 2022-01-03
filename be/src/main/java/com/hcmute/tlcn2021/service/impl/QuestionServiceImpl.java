@@ -203,14 +203,14 @@ public class QuestionServiceImpl implements QuestionService {
             if (questionReplyRequest.isConsultDean()) {
 
                 User dean = userRepository.findByRole_NameEqualsAndFaculty_IdEqualsAndIsDeletedFalse(ERole.ROLE_DEAN, question.getFaculty().getId())
-                        .orElseThrow(() -> new UteForumException("Không tìm được Trưởng khoa", HttpStatus.INTERNAL_SERVER_ERROR));
+                        .orElseThrow(() -> new UteForumException("Không tìm được Trưởng ban tư vấn", HttpStatus.INTERNAL_SERVER_ERROR));
                 if (ObjectUtils.isEmpty(dean.getEmail())) {
-                    throw new UteForumException("Trưởng khoa chưa cung cấp email", HttpStatus.NOT_FOUND);
+                    throw new UteForumException("Trưởng ban tư vấn chưa cung cấp email", HttpStatus.NOT_FOUND);
                 }
 
                 message = new StringBuilder();
                 message.append("<p>").append("Chào ").append(dean.getFullName()).append("</p>");
-                message.append("<p>").append("Với vai trò Trưởng khoa, bạn nhận được một đề nghị phê duyệt câu trả lời").append("</p>");
+                message.append("<p>").append("Với vai trò Trưởng ban tư vấn, bạn nhận được một đề nghị phê duyệt câu trả lời").append("</p>");
                 message.append("<p>").append(MessageFormat.format("Mời bạn xem tại địa chỉ <a href=\"{0}\">{0}</a>", feQuestionReplierPath + question.getId())).append("</p>");
                 emailService.sendHtmlMessage(dean.getEmail(), "Thư xin phê duyệt câu trả lời", message.toString());
             }
