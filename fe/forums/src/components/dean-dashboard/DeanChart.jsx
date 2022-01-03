@@ -29,7 +29,7 @@ const DeanChart = () => {
       <h4>Thống kê và biểu đồ</h4>
       <Row>
         <Chart
-          width={1600}
+          width={800}
           height={500}
           chartType="PieChart"
           loader={<div>Loading Chart</div>}

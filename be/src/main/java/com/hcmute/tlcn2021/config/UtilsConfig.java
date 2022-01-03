@@ -33,7 +33,7 @@ public class UtilsConfig {
     }
 
     @Bean
-    public ExecutorService getExecuterService() {
+    public ExecutorService getExecutorService() {
         return Executors.newFixedThreadPool(10);
     }
 }
