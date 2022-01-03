@@ -30,7 +30,7 @@ const DeanDashBoard = () => {
     <Router>
       <div>
         <Container fluid>
-          <h2 className="left-title">Trang Trưởng khoa</h2>
+          <h2 className="left-title">Trang Trưởng ban tư vấn</h2>
           <Row>
             <Col md="3">
               <ListGroup>
