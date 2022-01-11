@@ -25,11 +25,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/{id}")
     public ResponseEntity<SingleUserDetailsResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
+    @Secured({"ROLE_ADMIN"})
     @PutMapping
     public ResponseEntity<MessageResponse> update(@RequestBody UserUpdateRequest userUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK.value())
@@ -44,6 +46,7 @@ public class UserController {
                 + "' was successfully deleted"));
     }
 
+    @Secured({"ROLE_ADMIN"})
     @GetMapping
     public ResponseEntity<UsersPaginationResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         return ResponseEntity.ok(userService.getPage(pageable));
