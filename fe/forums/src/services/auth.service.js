@@ -4,14 +4,14 @@ import http from "./http-common";
 const API_URL = "/auth/";
 
 const register = (signUpRequestObject) => {
-  return http.post(API_URL + "sign-up", signUpRequestObject,{
+  return http.post(API_URL + "sign-up", signUpRequestObject, {
     headers: authHeader(),
   });
 };
 
-const createFaculty = (createFacultyRequestObject) => {
-  return http.post(API_URL + "insert", createFacultyRequestObject);
-};
+// const createFaculty = (createFacultyRequestObject) => {
+//   return http.post(API_URL + "insert", createFacultyRequestObject);
+// };
 
 const login = (username, password) => {
   return http
@@ -44,7 +44,7 @@ const getCurrentUser = () => {
 
 const authenService = {
   register,
-  createFaculty,
+  // createFaculty,
   login,
   logout,
   getCurrentUser,

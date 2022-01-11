@@ -5,11 +5,15 @@ const API_URL = "/user";
 
 const getAll = (pageNum = 1, pageSize = 5) => {
   pageNum--;
-  return http.get("/user?size=" + pageSize + "&page=" + pageNum);
+  return http.get("/user?size=" + pageSize + "&page=" + pageNum, {
+    headers: authHeader(),
+  });
 };
 
 const getById = (id = 0) => {
-  return http.get(`/user/${id}`);
+  return http.get(`/user/${id}`,{
+    headers: authHeader(),
+  });
 };
 
 const deleteById = (id = 0) => {
@@ -17,7 +21,9 @@ const deleteById = (id = 0) => {
 };
 
 const update = (updateRequestObject) => {
-  return http.put("/user", updateRequestObject);
+  return http.put("/user", updateRequestObject, {
+    headers: authHeader(),
+  });
 };
 
 const getByDean = (params) => {
