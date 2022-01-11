@@ -116,11 +116,11 @@ public class UserServiceImpl implements UserService {
                 encoder.encode(password));
 
         user.setRole(roleRepository.findById(signUpRequest.getRoleId())
-                .orElseThrow(() -> new UteForumException("Vai trò với id = " + signUpRequest.getRoleId() + "không tồn tại.", HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new UteForumException("Vai trò với id = " + signUpRequest.getRoleId() + "không tồn tại.", HttpStatus.BAD_REQUEST)));
 
         if (signUpRequest.getFacultyId() != 0) {
             user.setFaculty(facultyRepository.findByIdAndIsDeletedFalse(signUpRequest.getFacultyId())
-                    .orElseThrow(() -> new UteForumException("Khoa với id = '" + signUpRequest.getFacultyId() + "' không tồn tại", HttpStatus.NOT_FOUND)));
+                    .orElseThrow(() -> new UteForumException("Khoa với id = '" + signUpRequest.getFacultyId() + "' không tồn tại", HttpStatus.BAD_REQUEST)));
         } else {
             user.setFaculty(null);
         }

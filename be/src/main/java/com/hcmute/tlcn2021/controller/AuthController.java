@@ -26,6 +26,7 @@ public class AuthController {
         return ResponseEntity.ok(userService.signIn(loginRequest));
     }
 
+    @Secured({"ROLE_ADMIN"})
     @PostMapping("/sign-up")
     public ResponseEntity<MessageResponse> registerUser(@RequestBody @Valid SignupRequest signUpRequest) {
 
